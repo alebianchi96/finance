@@ -1,0 +1,2 @@
+bun run create_entity PatrimonialFundEntity PfTypoEntity patrimonial_funds
+bun run create_entity MovementEntity PfEntity movements

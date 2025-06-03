@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:14.4
+    container_name: personal_finance_db
+    restart: always
+    environment:
+      POSTGRES_USER: alepf
+      POSTGRES_PASSWORD: alepf
+      POSTGRES_DB: personal_finance_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - C:/Users/alexb/me/personal_info/finance/structure/volume/database:/var/lib/postgresql/data
