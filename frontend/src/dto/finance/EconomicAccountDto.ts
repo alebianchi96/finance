@@ -3,6 +3,6 @@ import type EconomicCategoryDto from "@/dto/finance/EconomicCategoryDto.ts";
 
 export default class EconomicAccountDto extends PfTypoDto {
 
-    economicCategory: EconomicCategoryDto;
+    economicCategory: EconomicCategoryDto | null = null;
 
 }

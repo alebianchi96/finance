@@ -4,11 +4,11 @@ import type PatrimonialFundDto from "@/dto/finance/PatrimonialFundDto";
 
 export default class MovementDto extends PfDto {
 
-    dt:Date;
-    economicAccount: EconomicAccountDto;
-    note:string;
-    patrimonialFund: PatrimonialFundDto;
-    amount: number;
-    blockId: number;
+    dt:Date = new Date();
+    economicAccount: EconomicAccountDto | null = null;
+    note:string = '';
+    patrimonialFund: PatrimonialFundDto | null = null;
+    amount: number = 0;
+    blockId: number = 0;
 
 }
