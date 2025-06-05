@@ -16,15 +16,15 @@ export default function Layout() {
     const [ theme, setTheme ] = React.useState('dark');
 
     function changeTheme() {
-        alert(theme)
+        //alert(theme)
         setTheme(theme === "dark" ? "light" : "dark");
     }
 
     const navItems = [
         { path: '/', label: 'Dashboard', icon: <LayoutDashboard className="w-4 h-4 mr-2" /> },
-        { path: '/amministrazione', label: 'Amministrazione', icon: <Settings className="w-4 h-4 mr-2" /> },
         { path: '/movimenti', label: 'Movimenti', icon: <ArrowDownUp className="w-4 h-4 mr-2" /> },
         { path: '/trasferimenti', label: 'Trasferimenti', icon: <Repeat className="w-4 h-4 mr-2" /> },
+        { path: '/amministrazione', label: 'Amministrazione', icon: <Settings className="w-4 h-4 mr-2" /> },
     ];
 
     return (
