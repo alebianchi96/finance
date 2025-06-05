@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/economic-categories")
+@CrossOrigin("*")
 public class EconomicCategoryController extends PfController<EconomicCategoryEntity, EconomicCategoryDto> {
 
     @Autowired

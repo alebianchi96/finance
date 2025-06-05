@@ -13,6 +13,7 @@ import java.time.temporal.TemporalField;
 
 @RestController
 @RequestMapping("/movements")
+@CrossOrigin("*")
 public class MovementController extends PfController<MovementEntity, MovementDto> {
 
     @Autowired

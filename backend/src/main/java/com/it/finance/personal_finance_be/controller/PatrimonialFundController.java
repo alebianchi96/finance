@@ -12,6 +12,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/patrimonial-funds")
+@CrossOrigin("*")
 public class PatrimonialFundController extends PfController<PatrimonialFundEntity, PatrimonialFundDto> {
 
     @Autowired
