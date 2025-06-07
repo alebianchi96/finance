@@ -11,9 +11,11 @@ import EconomicCategoryService from "@/service/EconomicCategoryService.ts";
 import SearchRequestDto from "@/dto/framework/SearchRequestDto.ts";
 import { Filter } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
-import { Label } from "@/components/ui/label";
+import type PfObjectApiResponse from "@/dto/framework/PfObjectApiResponse.ts";
+import type SearchResponseDto from "@/dto/framework/SearchResponseDto.ts";
 
 export default function EconomicCategoryManager() {
+
     const [categories, setCategories] = useState<EconomicCategoryDto[]>([]);
     const [open, setOpen] = useState(false);
     const [currentCategory, setCurrentCategory] = useState<EconomicCategoryDto | null>(null);
@@ -24,24 +26,35 @@ export default function EconomicCategoryManager() {
     const service = EconomicCategoryService.getInstance();
 
     useEffect(() => {
-        loadCategories();
+        loadCategories(natureFilter, codeFilter);
     }, [])
 
+    const handleChangeNatureFilter = (e: string) => {
+        setNatureFilter(e);
+        loadCategories(e, codeFilter);
+    }
+
+
     // Queste funzioni sarebbero implementate con chiamate API al backend
-    const loadCategories = async () => {
+    const loadCategories = async (
+        natureValue:string|undefined,
+        codeValue:string|undefined
+    ) => {
         // API call to load categories
         const searchRequest = new SearchRequestDto<EconomicCategoryDto>();
         searchRequest.dto = new EconomicCategoryDto();
         searchRequest.size = 999999
         searchRequest.page = 1;
-        if (natureFilter && natureFilter !== "any") {
-            searchRequest.dto.nature = natureFilter;
-        }
-        if (codeFilter) {
-            searchRequest.dto.code = codeFilter;
+
+        if( natureValue && natureValue !== "any" ) {
+            searchRequest.dto.nature = natureValue;
         }
 
-        let response = await service.search(searchRequest);
+        if (codeValue) {
+            searchRequest.dto.code = codeValue;
+        }
+
+        let response : PfObjectApiResponse<SearchResponseDto<EconomicCategoryDto>> = await service.search(searchRequest);
         let lst = response?.dto?.list || [];
         if(lst) {
             lst.sort((a, b) => {
@@ -59,7 +72,7 @@ export default function EconomicCategoryManager() {
     const resetFilters = () => {
         setNatureFilter("");
         setCodeFilter("");
-        loadCategories();
+        loadCategories("", "");
     };
 
     const saveCategory = async (category: EconomicCategoryDto) => {
@@ -76,13 +89,13 @@ export default function EconomicCategoryManager() {
         }
 
         setOpen(false);
-        await loadCategories();
+        await loadCategories(natureFilter, codeFilter);
     };
 
     const deleteCategory = async (id: number) => {
         // API call to delete the category
         await service.delete(id);
-        await loadCategories();
+        await loadCategories(natureFilter, codeFilter);
     };
 
     return (
@@ -107,14 +120,32 @@ export default function EconomicCategoryManager() {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div>
                         <label className="text-sm mb-1 block">Natura</label>
-                        <Select value={natureFilter} onValueChange={setNatureFilter}>
+                        <Select value={natureFilter} onValueChange={(e)=>handleChangeNatureFilter(e)}>
                             <SelectTrigger>
                                 <SelectValue placeholder="Qualsiasi natura" />
                             </SelectTrigger>
                             <SelectContent>
                                 <SelectItem value="any">Qualsiasi</SelectItem>
-                                <SelectItem value="C" className="text-white font-medium bg-red-600">COSTO</SelectItem>
-                                <SelectItem value="R" className="text-white font-medium bg-green-600">RICAVO</SelectItem>
+                                {
+                                    [{
+                                        value: 'C',
+                                        label: 'COSTO',
+                                        color: 'bg-red-600'
+                                    }, {
+                                        value: 'R',
+                                        label: 'RICAVO',
+                                        color: 'bg-green-600'
+                                    }].map(obj=>(
+                                        <SelectItem value={obj.value} key={obj.value}>
+                                            <div className="flex items-center gap-2">
+                                                <div className={`w-4 text-white font-medium h-4 rounded-full ${obj.color}`}></div>
+                                                <span className="font-medium">
+                                                    {obj.label}
+                                                </span>
+                                            </div>
+                                        </SelectItem>
+                                    ))
+                                }
                             </SelectContent>
                         </Select>
                     </div>
@@ -129,7 +160,7 @@ export default function EconomicCategoryManager() {
                     </div>
 
                     <div className="flex items-end gap-2">
-                        <Button onClick={loadCategories} className="flex-1">
+                        <Button onClick={()=>loadCategories(natureFilter, codeFilter)} className="flex-1">
                             Applica filtri
                         </Button>
                         <Button variant="outline" onClick={resetFilters}>
@@ -142,7 +173,6 @@ export default function EconomicCategoryManager() {
             <Table>
                 <TableHeader>
                     <TableRow>
-                        <TableHead>Natura</TableHead>
                         <TableHead>Codice</TableHead>
                         <TableHead>Etichetta</TableHead>
                         <TableHead>Azioni</TableHead>
@@ -151,11 +181,27 @@ export default function EconomicCategoryManager() {
                 <TableBody>
                     {categories?.map(category => (
                         <TableRow key={category.id}>
-                            {/* <TableCell>{category.id}</TableCell> */}
+                            {/* <TableCell>{category.id}</TableCell>
                             <TableCell className={`text-white font-medium ${category.nature === 'C' ? "bg-red-600" : "bg-green-600"}`}>
                                 {category.nature === 'C' ? 'COSTO' : 'RICAVO'}
                             </TableCell>
-                            <TableCell>{category.code}</TableCell>
+                             */}
+                            <TableCell className={'flex items-center gap-2'}>
+                                <div style={{
+                                    borderRadius:'50px',
+                                    width:'30px',
+                                    height:'30px'
+                                }}
+                                className={
+                                    `text-white font-medium flex items-center justify-center `
+                                    + (category.nature === 'C' ? "bg-red-600" : "bg-green-600")
+                                }>
+                                    {category.nature}
+                                </div>
+                                <div>
+                                {category.code}
+                                </div>
+                            </TableCell>
                             <TableCell>{category.label}</TableCell>
                             <TableCell>
                                 <div className="flex gap-2">
