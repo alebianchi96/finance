@@ -6,71 +6,75 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { Input } from "@/components/ui/input";
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
 import PatrimonialFundDto from "@/dto/finance/PatrimonialFundDto";
+import SearchRequestDto from "@/dto/framework/SearchRequestDto";
+import type PfObjectApiResponse from "@/dto/framework/PfObjectApiResponse.ts";
+import type SearchResponseDto from "@/dto/framework/SearchResponseDto.ts";
+import EconomicCategoryDto from "@/dto/finance/EconomicCategoryDto.ts";
+import EconomicCategoryService from "@/service/EconomicCategoryService.ts";
+import PatrimonialFundService from "@/service/PatrimonialFundService.ts";
+import {Filter} from "lucide-react";
+import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select.tsx";
 
 export default function PatrimonialFundManager() {
+
     const [funds, setFunds] = useState<PatrimonialFundDto[]>([]);
     const [open, setOpen] = useState(false);
     const [currentFund, setCurrentFund] = useState<PatrimonialFundDto | null>(null);
+    const [codeFilter, setCodeFilter] = useState<string>("");
+
+    const service = PatrimonialFundService.getInstance();
 
     useEffect(() => {
-        loadFunds();
+        loadFunds(codeFilter);
     }, []);
 
-    const loadFunds = async () => {
-        try {
-            const response = await fetch("/api/patrimonial-funds");
-            if (response.ok) {
-                const data = await response.json();
-                setFunds(data);
-            }
-        } catch (error) {
-            console.error("Errore durante il caricamento dei fondi:", error);
+    const loadFunds = async (
+        codeValue:string|undefined
+    ) => {
+
+        // API call to load categories
+        const searchRequest = new SearchRequestDto<PatrimonialFundDto>();
+        searchRequest.dto = new PatrimonialFundDto();
+        searchRequest.size = 999999
+        searchRequest.page = 1;
+        if (codeValue) {
+            searchRequest.dto.code = codeValue;
         }
+
+        let response : PfObjectApiResponse<SearchResponseDto<PatrimonialFundDto>> = await service.search(searchRequest);
+        let lst = response?.dto?.list || [];
+        if(lst) {
+            lst.sort((a, b) => {
+                return a.code < b.code ? -1 : 1;
+            });
+        }
+        setFunds( lst );
+
     };
 
-    const saveFund = async (fund: PatrimonialFundDto) => {
-        try {
-            const url = fund.id ? `/api/patrimonial-funds/${fund.id}` : "/api/patrimonial-funds";
-            const method = fund.id ? "PUT" : "POST";
+    const resetFilters = () => {
+        setCodeFilter("");
+        loadFunds("");
+    };
 
-            const response = await fetch(url, {
-                method,
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(fund)
-            });
-
-            if (response.ok) {
-                setOpen(false);
-                loadFunds();
-            }
-        } catch (error) {
-            console.error("Errore durante il salvataggio del fondo:", error);
+    const saveFund = async (
+        fund: PatrimonialFundDto) => {
+        if( fund.id ) {
+            await service.edit(fund);
+        } else {
+            await service.insert(fund);
         }
+
+        setOpen(false);
+        await loadFunds(codeFilter);
     };
 
     const deleteFund = async (id: number) => {
-        try {
-            const response = await fetch(`/api/patrimonial-funds/${id}`, {
-                method: "DELETE"
-            });
-
-            if (response.ok) {
-                loadFunds();
-            }
-        } catch (error) {
-            console.error("Errore durante l'eliminazione del fondo:", error);
-        }
+        // API call to delete the category
+        await service.delete(id);
+        await loadFunds(codeFilter);
     };
 
-    const formatCurrency = (amount: number | undefined) => {
-        if (amount === undefined) return '-';
-        return new Intl.NumberFormat('it-IT', {
-            style: 'currency',
-            currency: 'EUR'
-        }).format(amount);
-    };
 
     return (
         <Card className="p-6">
@@ -84,23 +88,61 @@ export default function PatrimonialFundManager() {
                 </Button>
             </div>
 
+            {/* Sezione filtri */}
+            <div className="bg-muted/40 p-4 rounded-md mb-6">
+                <div className="flex items-center gap-2 mb-2">
+                    <Filter className="w-4 h-4" />
+                    <h3 className="font-medium">Filtri</h3>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                        <label className="text-sm mb-1 block">Codice</label>
+                        <Input
+                            value={codeFilter}
+                            onChange={(e) => setCodeFilter(e.target.value)}
+                            placeholder="Filtra per codice"
+                        />
+                    </div>
+
+                    <div className="flex items-end gap-2">
+                        <Button onClick={()=>loadFunds(codeFilter)} className="flex-1">
+                            Applica filtri
+                        </Button>
+                        <Button variant="outline" onClick={resetFilters}>
+                            Resetta
+                        </Button>
+                    </div>
+                </div>
+            </div>
+
             <Table>
                 <TableHeader>
                     <TableRow>
-                        <TableHead>ID</TableHead>
-                        <TableHead>Nome</TableHead>
-                        <TableHead>Descrizione</TableHead>
-                        <TableHead className="text-right">Saldo</TableHead>
+                        <TableHead>Codice</TableHead>
+                        <TableHead>Etichetta</TableHead>
                         <TableHead>Azioni</TableHead>
                     </TableRow>
                 </TableHeader>
                 <TableBody>
                     {funds.map(fund => (
                         <TableRow key={fund.id}>
-                            <TableCell>{fund.id}</TableCell>
-                            <TableCell>{fund.name}</TableCell>
-                            <TableCell>{fund.description}</TableCell>
-                            <TableCell className="text-right">{formatCurrency(fund.balance)}</TableCell>
+                            <TableCell className={'flex items-center gap-2'}>
+                                <div style={{
+                                    borderRadius:'50px',
+                                    width:'30px',
+                                    height:'30px'
+                                }}
+                                 className={
+                                     `text-white font-medium flex items-center justify-center bg-blue-600`
+                                 }>
+                                    💰
+                                </div>
+                                <div>
+                                    {fund.code}
+                                </div>
+                            </TableCell>
+                            <TableCell>{fund.label}</TableCell>
                             <TableCell>
                                 <div className="flex gap-2">
                                     <Button variant="outline" size="sm" onClick={() => {
@@ -127,30 +169,19 @@ export default function PatrimonialFundManager() {
                     {currentFund && (
                         <div className="space-y-4">
                             <div>
-                                <label className="block text-sm mb-1">Nome</label>
+                                <label className="block text-sm mb-1">Codice</label>
                                 <Input
-                                    value={currentFund.name || ''}
-                                    onChange={e => setCurrentFund({...currentFund, name: e.target.value})}
+                                    value={currentFund.code || ''}
+                                    onChange={e => setCurrentFund({...currentFund, code: e.target.value})}
                                 />
                             </div>
                             <div>
-                                <label className="block text-sm mb-1">Descrizione</label>
+                                <label className="block text-sm mb-1">Etichetta</label>
                                 <Input
-                                    value={currentFund.description || ''}
-                                    onChange={e => setCurrentFund({...currentFund, description: e.target.value})}
+                                    value={currentFund.label || ''}
+                                    onChange={e => setCurrentFund({...currentFund, label: e.target.value})}
                                 />
                             </div>
-                            {!currentFund.id && (
-                                <div>
-                                    <label className="block text-sm mb-1">Saldo Iniziale</label>
-                                    <Input
-                                        type="number"
-                                        step="0.01"
-                                        value={currentFund.balance || ''}
-                                        onChange={e => setCurrentFund({...currentFund, balance: parseFloat(e.target.value)})}
-                                    />
-                                </div>
-                            )}
                             <DialogFooter>
                                 <Button type="submit" onClick={() => saveFund(currentFund)}>
                                     Salva

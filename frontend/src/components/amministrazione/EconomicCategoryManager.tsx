@@ -181,11 +181,6 @@ export default function EconomicCategoryManager() {
                 <TableBody>
                     {categories?.map(category => (
                         <TableRow key={category.id}>
-                            {/* <TableCell>{category.id}</TableCell>
-                            <TableCell className={`text-white font-medium ${category.nature === 'C' ? "bg-red-600" : "bg-green-600"}`}>
-                                {category.nature === 'C' ? 'COSTO' : 'RICAVO'}
-                            </TableCell>
-                             */}
                             <TableCell className={'flex items-center gap-2'}>
                                 <div style={{
                                     borderRadius:'50px',
@@ -229,14 +224,14 @@ export default function EconomicCategoryManager() {
                     {currentCategory && (
                         <div className="space-y-4">
                             <div>
-                                <label className="block text-sm mb-1">Nome</label>
+                                <label className="block text-sm mb-1">Codice</label>
                                 <Input
                                     value={currentCategory.code || ''}
                                     onChange={e => setCurrentCategory({...currentCategory, code: e.target.value})}
                                 />
                             </div>
                             <div>
-                                <label className="block text-sm mb-1">Descrizione</label>
+                                <label className="block text-sm mb-1">Etichetta</label>
                                 <Input
                                     value={currentCategory.label || ''}
                                     onChange={e => setCurrentCategory({...currentCategory, label: e.target.value})}
