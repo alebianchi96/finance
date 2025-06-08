@@ -136,7 +136,7 @@ export default function PatrimonialFundManager() {
                                  className={
                                      `text-white font-medium flex items-center justify-center bg-blue-600`
                                  }>
-                                    💰
+                                    F
                                 </div>
                                 <div>
                                     {fund.code}

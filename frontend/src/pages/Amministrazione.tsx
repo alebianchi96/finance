@@ -15,7 +15,7 @@ export default function Amministrazione() {
             <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
                 <TabsList className="grid w-full grid-cols-3">
                     <TabsTrigger value="categories">Categorie Economiche</TabsTrigger>
-                    <TabsTrigger value="accounts">Account Economici</TabsTrigger>
+                    <TabsTrigger value="accounts">Conti Economici</TabsTrigger>
                     <TabsTrigger value="funds">Fondi Patrimoniali</TabsTrigger>
                 </TabsList>
                 <TabsContent value="categories">
