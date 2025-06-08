@@ -3,6 +3,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
 import MovementDto from "@/dto/finance/MovementDto";
+import CurrencyEur from "@/lib/CurrencyEur.ts";
 
 interface TransferTableProps {
     transfers: MovementDto[];
@@ -11,12 +12,6 @@ interface TransferTableProps {
 }
 
 export default function TransferTable({ transfers, onEdit, onDelete }: TransferTableProps) {
-    const formatCurrency = (amount: number) => {
-        return new Intl.NumberFormat('it-IT', {
-            style: 'currency',
-            currency: 'EUR'
-        }).format(amount);
-    };
 
     return (
         <Table>
@@ -27,7 +22,7 @@ export default function TransferTable({ transfers, onEdit, onDelete }: TransferT
                     <TableHead>A Fondo</TableHead>
                     <TableHead className="text-right">Importo</TableHead>
                     <TableHead>Note</TableHead>
-                    <TableHead>Azioni</TableHead>
+                    <TableHead className="text-center">Azioni</TableHead>
                 </TableRow>
             </TableHeader>
             <TableBody>
@@ -43,10 +38,12 @@ export default function TransferTable({ transfers, onEdit, onDelete }: TransferT
                             <TableCell>{format(new Date(transfer.dt), 'dd/MM/yyyy')}</TableCell>
                             <TableCell>{transfer.fromPatrimonialFund?.name}</TableCell>
                             <TableCell>{transfer.patrimonialFund?.name}</TableCell>
-                            <TableCell className="text-right">{formatCurrency(Math.abs(transfer.amount))}</TableCell>
+                            <TableCell className="text-right">{
+                                CurrencyEur.getInstance().format(Math.abs(transfer.amount))
+                            }</TableCell>
                             <TableCell>{transfer.note}</TableCell>
                             <TableCell>
-                                <div className="flex gap-2">
+                                <div className="flex justify-center gap-2">
                                     <Button variant="outline" size="sm" onClick={() => onEdit(transfer.id)}>
                                         Modifica
                                     </Button>

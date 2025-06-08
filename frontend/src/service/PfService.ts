@@ -6,11 +6,11 @@ import type SearchResponseDto from "@/dto/framework/SearchResponseDto.ts";
 
 export default abstract class PfService<DTO extends PfDto> {
 
-    private getBackendUrl() { return "http://localhost:8080" }
+    protected getBackendUrl() { return "http://localhost:8080" }
 
     abstract getDomain() : string;
 
-    private async readResponse(response:Response) {
+    protected async readResponse(response:Response) {
         if (!response.ok) {
             console.error(response);
             throw new Error(`Error fetching data: ${response.statusText}`);

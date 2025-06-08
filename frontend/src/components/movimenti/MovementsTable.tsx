@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { format } from "date-fns";
 import MovementDto from "@/dto/finance/MovementDto";
+import CurrencyEur from "@/lib/CurrencyEur.ts";
 
 interface MovementsTableProps {
     movements: MovementDto[];
@@ -12,12 +13,6 @@ interface MovementsTableProps {
 }
 
 export default function MovementsTable({ movements, onEdit, onDelete }: MovementsTableProps) {
-    const formatCurrency = (amount: number) => {
-        return new Intl.NumberFormat('it-IT', {
-            style: 'currency',
-            currency: 'EUR'
-        }).format(amount);
-    };
 
     return (
         <Card className="overflow-hidden">
@@ -28,7 +23,7 @@ export default function MovementsTable({ movements, onEdit, onDelete }: Movement
                         <TableHead>Account Economico</TableHead>
                         <TableHead>Note</TableHead>
                         <TableHead className="text-right">Importo</TableHead>
-                        <TableHead>Azioni</TableHead>
+                        <TableHead className="text-center">Azioni</TableHead>
                     </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -42,13 +37,15 @@ export default function MovementsTable({ movements, onEdit, onDelete }: Movement
                         movements.map((movement) => (
                             <TableRow key={movement.id}>
                                 <TableCell>{format(new Date(movement.dt), 'dd/MM/yyyy')}</TableCell>
-                                <TableCell>{movement.economicAccount?.name || 'N/D'}</TableCell>
+                                <TableCell>
+                                    {movement.economicAccount?.economicCategory?.label + " - " + movement.economicAccount?.label}
+                                </TableCell>
                                 <TableCell>{movement.note}</TableCell>
                                 <TableCell className={`text-right ${movement.amount >= 0 ? 'text-green-500' : 'text-red-500'}`}>
-                                    {formatCurrency(movement.amount)}
+                                    {CurrencyEur.getInstance().format(movement.amount)}
                                 </TableCell>
                                 <TableCell>
-                                    <div className="flex space-x-2">
+                                    <div className="flex justify-center space-x-2">
                                         <Button variant="outline" size="sm" onClick={() => onEdit(movement)}>
                                             Modifica
                                         </Button>

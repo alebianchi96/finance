@@ -13,6 +13,7 @@ import { Filter } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import type PfObjectApiResponse from "@/dto/framework/PfObjectApiResponse.ts";
 import type SearchResponseDto from "@/dto/framework/SearchResponseDto.ts";
+import BulletAndLabelNature from "@/components/common/BulletAndLabelNature.tsx";
 
 export default function EconomicCategoryManager() {
 
@@ -40,33 +41,7 @@ export default function EconomicCategoryManager() {
         natureValue:string|undefined,
         codeValue:string|undefined
     ) => {
-        // API call to load categories
-        const searchRequest = new SearchRequestDto<EconomicCategoryDto>();
-        searchRequest.dto = new EconomicCategoryDto();
-        searchRequest.size = 999999
-        searchRequest.page = 1;
-
-        if( natureValue && natureValue !== "any" ) {
-            searchRequest.dto.nature = natureValue;
-        }
-
-        if (codeValue) {
-            searchRequest.dto.code = codeValue;
-        }
-
-        let response : PfObjectApiResponse<SearchResponseDto<EconomicCategoryDto>> = await service.search(searchRequest);
-        let lst = response?.dto?.list || [];
-        if(lst) {
-            lst.sort((a, b) => {
-
-                if( a.nature==b.nature ) {
-                    return a.code < b.code ? -1 : 1;
-                }
-                return a.nature < b.nature ? -1 : 1;
-
-            });
-        }
-        setCategories( lst );
+        await service.load(natureValue, codeValue, setCategories);
     };
 
     const resetFilters = () => {
@@ -126,26 +101,12 @@ export default function EconomicCategoryManager() {
                             </SelectTrigger>
                             <SelectContent>
                                 <SelectItem value="any">Qualsiasi</SelectItem>
-                                {
-                                    [{
-                                        value: 'C',
-                                        label: 'COSTO',
-                                        color: 'bg-red-600'
-                                    }, {
-                                        value: 'R',
-                                        label: 'RICAVO',
-                                        color: 'bg-green-600'
-                                    }].map(obj=>(
-                                        <SelectItem value={obj.value} key={obj.value}>
-                                            <div className="flex items-center gap-2">
-                                                <div className={`w-4 text-white font-medium h-4 rounded-full ${obj.color}`}></div>
-                                                <span className="font-medium">
-                                                    {obj.label}
-                                                </span>
-                                            </div>
-                                        </SelectItem>
-                                    ))
-                                }
+                                <SelectItem value="C" key="C">
+                                    <BulletAndLabelNature nature="C" />
+                                </SelectItem>
+                                <SelectItem value="R" key="R">
+                                    <BulletAndLabelNature nature="R" />
+                                </SelectItem>
                             </SelectContent>
                         </Select>
                     </div>
@@ -175,7 +136,7 @@ export default function EconomicCategoryManager() {
                     <TableRow>
                         <TableHead>Codice</TableHead>
                         <TableHead>Etichetta</TableHead>
-                        <TableHead>Azioni</TableHead>
+                        <TableHead className="text-center">Azioni</TableHead>
                     </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -199,7 +160,7 @@ export default function EconomicCategoryManager() {
                             </TableCell>
                             <TableCell>{category.label}</TableCell>
                             <TableCell>
-                                <div className="flex gap-2">
+                                <div className="flex justify-center gap-2">
                                     <Button variant="outline" size="sm" onClick={() => {
                                         setCurrentCategory(category);
                                         setOpen(true);

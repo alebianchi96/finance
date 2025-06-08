@@ -7,6 +7,10 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import MovementDto from "@/dto/finance/MovementDto";
 import EconomicAccountDto from "@/dto/finance/EconomicAccountDto";
+import type EconomicCategoryDto from "@/dto/finance/EconomicCategoryDto.ts";
+import EconomicCategoryService from "@/service/EconomicCategoryService.ts";
+import EconomicAccountService from "@/service/EconomicAccountService.ts";
+import BulletAndLabelNature from "@/components/common/BulletAndLabelNature.tsx";
 
 interface MovementFormProps {
     movement: MovementDto;
@@ -14,28 +18,37 @@ interface MovementFormProps {
     onCancel: () => void;
     isOpen: boolean;
     setIsOpen: (open: boolean) => void;
+    nature?: "C" | "R";
 }
 
-export default function MovementForm({ movement, onSave, onCancel, isOpen, setIsOpen }: MovementFormProps) {
+export default function MovementForm({ movement, onSave, onCancel, isOpen, setIsOpen, nature }: MovementFormProps) {
+
     const [formData, setFormData] = useState<MovementDto>({...movement});
+
+    const [economicCategories, setEconomicCategories] = useState<EconomicCategoryDto[]>([]);
     const [economicAccounts, setEconomicAccounts] = useState<EconomicAccountDto[]>([]);
+
+    const [selectedCategory, setSelectedCategory] = useState<EconomicCategoryDto | null>(null);
+
+    const economicCategoryService = EconomicCategoryService.getInstance();
+    const economicAccountService = EconomicAccountService.getInstance();
+
+    // Caricamento delle categorie economiche
+    useEffect(() => {
+        economicCategoryService.load(nature, undefined, setEconomicCategories)
+        // occorre caricare gli accounts usando la categoria del formData
+        if(formData && formData.economicAccount && formData.economicAccount.economicCategory) {
+            economicAccountService.load(
+                nature,
+                formData.economicAccount.economicCategory.code, undefined, setEconomicAccounts)
+        }
+    }, []);
 
     // Caricamento degli account economici
     useEffect(() => {
-        const loadAccounts = async () => {
-            try {
-                const response = await fetch("/api/economic-accounts");
-                if (response.ok) {
-                    const data = await response.json();
-                    setEconomicAccounts(data);
-                }
-            } catch (error) {
-                console.error("Errore durante il caricamento degli account economici:", error);
-            }
-        };
+        selectedCategory && economicAccountService.load(nature, selectedCategory.code, undefined, setEconomicAccounts)
+    }, [selectedCategory]);
 
-        loadAccounts();
-    }, []);
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -50,8 +63,11 @@ export default function MovementForm({ movement, onSave, onCancel, isOpen, setIs
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
             <DialogContent className="sm:max-w-[500px]">
                 <DialogHeader>
-                    <DialogTitle>
-                        {movement.id ? "Modifica Movimento" : "Nuovo Movimento"}
+                    <DialogTitle className="flex justify-around">
+                        <div className="flex ">
+                           <span>{movement.id ? "Modifica Movimento" : "Nuovo Movimento"}</span>
+                        </div>
+                        <BulletAndLabelNature nature={nature} />
                     </DialogTitle>
                 </DialogHeader>
 
@@ -82,8 +98,33 @@ export default function MovementForm({ movement, onSave, onCancel, isOpen, setIs
                     </div>
 
                     <div className="space-y-2">
-                        <Label htmlFor="account">Account Economico</Label>
+                        <Label htmlFor="account">Categoria:</Label>
                         <Select
+                            value={formData.economicAccount?.economicCategory?.id.toString()}
+                            onValueChange={(value) => {
+                                const category = economicCategories.find(a => a.id === parseInt(value));
+                                if (category) {
+                                    setSelectedCategory(category);
+                                }
+                            }}
+                        >
+                            <SelectTrigger>
+                                <SelectValue placeholder="Seleziona una categoria" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                {economicCategories.map(category => (
+                                    <SelectItem key={category.id} value={category.id.toString()}>
+                                        {category.label}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                    </div>
+
+                    <div className="space-y-2">
+                        <Label htmlFor="account">Conto economico:</Label>
+                        <Select
+                            required
                             value={formData.economicAccount?.id?.toString()}
                             onValueChange={(value) => {
                                 const account = economicAccounts.find(a => a.id === parseInt(value));
@@ -98,7 +139,7 @@ export default function MovementForm({ movement, onSave, onCancel, isOpen, setIs
                             <SelectContent>
                                 {economicAccounts.map(account => (
                                     <SelectItem key={account.id} value={account.id.toString()}>
-                                        {account.name}
+                                        {account.label}
                                     </SelectItem>
                                 ))}
                             </SelectContent>
@@ -120,6 +161,7 @@ export default function MovementForm({ movement, onSave, onCancel, isOpen, setIs
                         </Button>
                         <Button type="submit">Salva</Button>
                     </DialogFooter>
+
                 </form>
             </DialogContent>
         </Dialog>

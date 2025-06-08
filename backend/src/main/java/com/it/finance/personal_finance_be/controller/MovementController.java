@@ -42,6 +42,30 @@ public class MovementController extends PfController<MovementEntity, MovementDto
         return super.search(searchRequest);
     }
 
+    @PostMapping("/search/economics")
+    public ResponseEntity<PfObjectApiResponse<SearchResponseDto<MovementDto>>> apiSearchEconomics(@RequestBody SearchRequestDto<MovementDto> searchRequest) {
+        try {
+            SearchResponseDto<MovementDto> response = service.searchEconomics(searchRequest);
+            return ResponseEntity.ok(PfObjectApiResponse.ok(response));
+        } catch (PfUnexpectedException e) {
+            return ResponseEntity.ok(PfObjectApiResponse.ko(
+                    e.getCode(), e.getInternalCode(), e.getMessage()
+            ));
+        }
+    }
+
+    @PostMapping("/search/transfers")
+    public ResponseEntity<PfObjectApiResponse<SearchResponseDto<MovementDto>>> apiSearchTransfers(@RequestBody SearchRequestDto<MovementDto> searchRequest) {
+        try {
+            SearchResponseDto<MovementDto> response = service.searchTransfers(searchRequest);
+            return ResponseEntity.ok(PfObjectApiResponse.ok(response));
+        } catch (PfUnexpectedException e) {
+            return ResponseEntity.ok(PfObjectApiResponse.ko(
+                    e.getCode(), e.getInternalCode(), e.getMessage()
+            ));
+        }
+    }
+
     @Override
     @PostMapping("/insert")
     public ResponseEntity<PfObjectApiResponse<MovementDto>> apiInsert(@RequestBody MovementDto dto) {

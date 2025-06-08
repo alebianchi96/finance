@@ -31,25 +31,7 @@ export default function PatrimonialFundManager() {
     const loadFunds = async (
         codeValue:string|undefined
     ) => {
-
-        // API call to load categories
-        const searchRequest = new SearchRequestDto<PatrimonialFundDto>();
-        searchRequest.dto = new PatrimonialFundDto();
-        searchRequest.size = 999999
-        searchRequest.page = 1;
-        if (codeValue) {
-            searchRequest.dto.code = codeValue;
-        }
-
-        let response : PfObjectApiResponse<SearchResponseDto<PatrimonialFundDto>> = await service.search(searchRequest);
-        let lst = response?.dto?.list || [];
-        if(lst) {
-            lst.sort((a, b) => {
-                return a.code < b.code ? -1 : 1;
-            });
-        }
-        setFunds( lst );
-
+        await service.load(codeValue, setFunds);
     };
 
     const resetFilters = () => {
@@ -121,7 +103,7 @@ export default function PatrimonialFundManager() {
                     <TableRow>
                         <TableHead>Codice</TableHead>
                         <TableHead>Etichetta</TableHead>
-                        <TableHead>Azioni</TableHead>
+                        <TableHead className="text-center">Azioni</TableHead>
                     </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -144,7 +126,7 @@ export default function PatrimonialFundManager() {
                             </TableCell>
                             <TableCell>{fund.label}</TableCell>
                             <TableCell>
-                                <div className="flex gap-2">
+                                <div className="flex justify-center gap-2">
                                     <Button variant="outline" size="sm" onClick={() => {
                                         setCurrentFund(fund);
                                         setOpen(true);

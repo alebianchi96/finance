@@ -14,6 +14,7 @@ import SearchRequestDto from "@/dto/framework/SearchRequestDto.ts";
 import type PfObjectApiResponse from "@/dto/framework/PfObjectApiResponse.ts";
 import type SearchResponseDto from "@/dto/framework/SearchResponseDto.ts";
 import {Filter} from "lucide-react";
+import BulletAndLabelNature from "@/components/common/BulletAndLabelNature.tsx";
 
 export default function EconomicAccountManager() {
 
@@ -48,81 +49,14 @@ export default function EconomicAccountManager() {
         codeCategoryValue:string|undefined,
         codeAccountValue:string|undefined
     ) => {
-        // API call to load categories
-        const searchRequest = new SearchRequestDto<EconomicAccountDto>();
-        searchRequest.dto = new EconomicAccountDto();
-        searchRequest.size = 999999
-        searchRequest.page = 1;
-
-        if( natureValue && natureValue !== "any" ) {
-            searchRequest.dto.economicCategory = searchRequest.dto.economicCategory ?? new EconomicCategoryDto();
-            searchRequest.dto.economicCategory.nature = natureValue;
-        }
-
-        if (codeCategoryValue) {
-            searchRequest.dto.economicCategory = searchRequest.dto.economicCategory ?? new EconomicCategoryDto();
-            searchRequest.dto.economicCategory.code = codeCategoryValue;
-        }
-
-        if (codeAccountValue) {
-            searchRequest.dto.code = codeAccountValue;
-        }
-
-        let response : PfObjectApiResponse<SearchResponseDto<EconomicAccountDto>> = await accountService.search(searchRequest);
-        let lst = response?.dto?.list || [];
-        if(lst) {
-            lst.sort((a, b) => {
-
-                // ordina a cascata per account.economicCategory.nature, account.economicCategory.code, account.code
-                // Primo livello: ordina per natura
-                if (a.economicCategory.nature !== b.economicCategory.nature) {
-                    return a.economicCategory.nature < b.economicCategory.nature ? -1 : 1;
-                }
-
-                // Secondo livello: stessa natura, ordina per codice categoria
-                if (a.economicCategory.code !== b.economicCategory.code) {
-                    return a.economicCategory.code < b.economicCategory.code ? -1 : 1;
-                }
-
-                // Terzo livello: stessa categoria, ordina per codice account
-                return a.code < b.code ? -1 : 1;
-
-            });
-        }
-        setAccounts( lst );
+        await accountService.load(natureValue, codeCategoryValue, codeAccountValue, setAccounts);
     };
 
     const loadCategories = async (
         natureValue:string|undefined,
         codeValue:string|undefined
     ) => {
-        // API call to load categories
-        const searchRequest = new SearchRequestDto<EconomicCategoryDto>();
-        searchRequest.dto = new EconomicCategoryDto();
-        searchRequest.size = 999999
-        searchRequest.page = 1;
-
-        if( natureValue && natureValue !== "any" ) {
-            searchRequest.dto.nature = natureValue;
-        }
-
-        if (codeValue) {
-            searchRequest.dto.code = codeValue;
-        }
-
-        let response : PfObjectApiResponse<SearchResponseDto<EconomicCategoryDto>> = await categoryService.search(searchRequest);
-        let lst = response?.dto?.list || [];
-        if(lst) {
-            lst.sort((a, b) => {
-
-                if( a.nature==b.nature ) {
-                    return a.code < b.code ? -1 : 1;
-                }
-                return a.nature < b.nature ? -1 : 1;
-
-            });
-        }
-        setCategories( lst );
+        await categoryService.load(natureValue, codeValue, setCategories);
     };
 
 
@@ -190,7 +124,7 @@ export default function EconomicAccountManager() {
                     <TableCell>{account.code}</TableCell>
                     <TableCell>{account.label}</TableCell>
                     <TableCell>
-                        <div className="flex gap-2">
+                        <div className="flex justify-center gap-2">
                             <Button variant="outline" size="sm" onClick={() => {
                                 setCurrentAccount(account);
                                 setOpen(true);
@@ -207,43 +141,6 @@ export default function EconomicAccountManager() {
         }
         return arrayRows;
 
-        /*
-        return accounts.map(account => (
-            <TableRow key={account.id}>
-                <TableCell className={'flex items-center gap-2'}>
-                    <div style={{
-                        borderRadius:'50px',
-                        width:'30px',
-                        height:'30px'
-                    }}
-                         className={
-                             `text-white font-medium flex items-center justify-center `
-                             + (account.economicCategory.nature === 'C' ? "bg-red-600" : "bg-green-600")
-                         }>
-                        {account.economicCategory.nature}
-                    </div>
-                    <div>
-                        {account.economicCategory.code}
-                    </div>
-                </TableCell>
-                <TableCell>{account.code}</TableCell>
-                <TableCell>{account.label}</TableCell>
-                <TableCell>
-                    <div className="flex gap-2">
-                        <Button variant="outline" size="sm" onClick={() => {
-                            setCurrentAccount(account);
-                            setOpen(true);
-                        }}>
-                            Modifica
-                        </Button>
-                        <Button variant="destructive" size="sm" onClick={() => deleteAccount(account.id)}>
-                            Elimina
-                        </Button>
-                    </div>
-                </TableCell>
-            </TableRow>
-        ))
-         */
     }
 
     return (
@@ -274,26 +171,12 @@ export default function EconomicAccountManager() {
                             </SelectTrigger>
                             <SelectContent>
                                 <SelectItem value="any">Qualsiasi</SelectItem>
-                                {
-                                    [{
-                                        value: 'C',
-                                        label: 'COSTO',
-                                        color: 'bg-red-600'
-                                    }, {
-                                        value: 'R',
-                                        label: 'RICAVO',
-                                        color: 'bg-green-600'
-                                    }].map(obj=>(
-                                        <SelectItem value={obj.value} key={obj.value}>
-                                            <div className="flex items-center gap-2">
-                                                <div className={`w-4 text-white font-medium h-4 rounded-full ${obj.color}`}></div>
-                                                <span className="font-medium">
-                                                    {obj.label}
-                                                </span>
-                                            </div>
-                                        </SelectItem>
-                                    ))
-                                }
+                                <SelectItem value="C" key="C">
+                                    <BulletAndLabelNature nature="C" />
+                                </SelectItem>
+                                <SelectItem value="R" key="R">
+                                    <BulletAndLabelNature nature="R" />
+                                </SelectItem>
                             </SelectContent>
                         </Select>
                     </div>
@@ -334,7 +217,7 @@ export default function EconomicAccountManager() {
                         <TableHead>Categoria</TableHead>
                         <TableHead>Codice</TableHead>
                         <TableHead>Etichetta</TableHead>
-                        <TableHead>Azioni</TableHead>
+                        <TableHead className="text-center">Azioni</TableHead>
                     </TableRow>
                 </TableHeader>
                 <TableBody>

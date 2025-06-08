@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -59,5 +61,22 @@ public class PatrimonialFundController extends PfController<PatrimonialFundEntit
         return super.delete(id);
     }
 
+    @GetMapping("/fund/{id}/at/{dtTimestamp}")
+    public ResponseEntity<PfObjectApiResponse<BigDecimal>> apiFundAmountByIdAtDate(
+            @PathVariable Long id,
+            @PathVariable Long dtTimestamp
+    ) {
+
+        LocalDateTime dt = LocalDateTime.ofEpochSecond(dtTimestamp / 1000, 0, java.time.ZoneOffset.UTC);
+
+        try {
+            BigDecimal amount = service.sumAmountByIdAndDtLessThanEqual(id, dt);
+            return ResponseEntity.ok(PfObjectApiResponse.ok(amount));
+        } catch (PfUnexpectedException e) {
+            return ResponseEntity.ok(PfObjectApiResponse.ko(
+                    e.getCode(), e.getInternalCode(), e.getMessage()
+            ));
+        }
+    }
 
 }

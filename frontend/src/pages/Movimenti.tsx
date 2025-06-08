@@ -7,51 +7,39 @@ import MovementsTable from "@/components/movimenti/MovementsTable.tsx";
 import MovementForm from "@/components/movimenti/MovementForm";
 import PatrimonialFundDto from "@/dto/finance/PatrimonialFundDto";
 import MovementDto from "@/dto/finance/MovementDto";
+import PatrimonialFundService from "@/service/PatrimonialFundService.ts";
+import MovementService from "@/service/MovementService.ts";
+import CurrencyEur from "@/lib/CurrencyEur.ts";
 
 export default function Movimenti() {
+
     const [patrimonialFunds, setPatrimonialFunds] = useState<PatrimonialFundDto[]>([]);
     const [selectedFundId, setSelectedFundId] = useState<string>("");
+    const [selectedFundAmount, setSelectedFundAmount] = useState<number>(0);
+
+    const [selectedNature, setSelectedNature] = useState<"C" | "R">("C"); // Costo o Ricavo
+
     const [movements, setMovements] = useState<MovementDto[]>([]);
     const [isFormOpen, setIsFormOpen] = useState(false);
     const [currentMovement, setCurrentMovement] = useState<MovementDto | null>(null);
 
+    const patrimonialFundService = PatrimonialFundService.getInstance();
+    const movementService = MovementService.getInstance();
+
     // Caricamento dei fondi patrimoniali
     useEffect(() => {
-        const loadFunds = async () => {
-            try {
-                const response = await fetch("/api/patrimonial-funds");
-                if (response.ok) {
-                    const data = await response.json();
-                    setPatrimonialFunds(data);
-                }
-            } catch (error) {
-                console.error("Errore durante il caricamento dei fondi:", error);
-            }
-        };
-
-        loadFunds();
+        patrimonialFundService.load("", setPatrimonialFunds);
     }, []);
 
     // Caricamento dei movimenti quando cambia il fondo selezionato
     useEffect(() => {
         if (!selectedFundId) return;
-
-        const loadMovements = async () => {
-            try {
-                const response = await fetch(`/api/movements?fundId=${selectedFundId}`);
-                if (response.ok) {
-                    const data = await response.json();
-                    setMovements(data);
-                }
-            } catch (error) {
-                console.error("Errore durante il caricamento dei movimenti:", error);
-            }
-        };
-
-        loadMovements();
+        movementService.loadMovementsByPatrimonialFundAndType(selectedFundId, "economics",  setMovements);
+        patrimonialFundService.fundAmountByIdAtDate(selectedFundId, new Date(), setSelectedFundAmount);
     }, [selectedFundId]);
 
-    const handleAddMovement = () => {
+    // @type IN C | R
+    const handleAddMovement = (type:'C'|'R') => {
         // Crea un nuovo movimento con il fondo patrimoniale selezionato
         if (!selectedFundId) return;
 
@@ -60,59 +48,48 @@ export default function Movimenti() {
 
         const newMovement = new MovementDto();
         newMovement.patrimonialFund = fund;
-        newMovement.dt = new Date();
 
+        // la data e' la massima presente in movements altrimenti la data attuale
+        newMovement.dt = movements.reduce((max, m) => m.dt && m.dt > max ? m.dt : max, new Date());
+
+        newMovement.blockId = new Date().getTime();
+
+        setSelectedNature(type)
         setCurrentMovement(newMovement);
         setIsFormOpen(true);
     };
 
     const handleEditMovement = (movement: MovementDto) => {
+        setSelectedNature(movement.economicAccount.economicCategory.nature === 'C' ? 'C' : 'R');
         setCurrentMovement(movement);
         setIsFormOpen(true);
     };
 
-    const handleDeleteMovement = async (id: number) => {
-        try {
-            const response = await fetch(`/api/movements/${id}`, {
-                method: "DELETE"
-            });
-
-            if (response.ok) {
-                // Aggiorna la lista dei movimenti rimuovendo quello eliminato
-                setMovements(movements.filter(m => m.id !== id));
-            }
-        } catch (error) {
-            console.error("Errore durante l'eliminazione del movimento:", error);
-        }
+    const deleteMovement = async (id: number) => {
+        await movementService.delete(id);
+        movementService.loadMovementsByPatrimonialFundAndType(selectedFundId, "economics",  setMovements);
     };
 
-    const handleSaveMovement = async (movement: MovementDto) => {
-        try {
-            const url = movement.id ? `/api/movements/${movement.id}` : "/api/movements";
-            const method = movement.id ? "PUT" : "POST";
+    const saveMovement = async (movement: MovementDto) => {
 
-            const response = await fetch(url, {
-                method,
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(movement)
-            });
-
-            if (response.ok) {
-                // Ricarica i movimenti per mostrare le modifiche
-                const refreshResponse = await fetch(`/api/movements?fundId=${selectedFundId}`);
-                if (refreshResponse.ok) {
-                    const data = await refreshResponse.json();
-                    setMovements(data);
-                }
-
-                setIsFormOpen(false);
-                setCurrentMovement(null);
-            }
-        } catch (error) {
-            console.error("Errore durante il salvataggio del movimento:", error);
+        // che natura ha il movimento
+        const nature = movement.economicAccount?.economicCategory?.nature;
+        if((nature=== 'C' && movement.amount > 0)
+            || (nature === 'R' && movement.amount < 0)) {
+            // i costi sono negativi
+            // i ricavi sono positivi
+            movement.amount = (movement.amount)*(-1);
         }
+
+        if(movement.id) {
+            // Aggiorna il movimento esistente
+            await movementService.edit(movement);
+        } else {
+            // Crea un nuovo movimento
+            await movementService.insert(movement);
+        }
+        setIsFormOpen(false);
+        await movementService.loadMovementsByPatrimonialFundAndType(selectedFundId, "economics",  setMovements);
     };
 
     return (
@@ -135,18 +112,54 @@ export default function Movimenti() {
                             <SelectContent>
                                 {patrimonialFunds.map(fund => (
                                     <SelectItem key={fund.id} value={fund.id.toString()}>
-                                        {fund.name}
+                                        <div style={{
+                                            borderRadius:'50px',
+                                            width:'30px',
+                                            height:'30px'
+                                        }}
+                                             className={
+                                                 `text-white font-medium flex items-center justify-center bg-blue-600`
+                                             }>
+                                            F
+                                        </div>
+                                        <div>
+                                            {fund.label}
+                                        </div>
                                     </SelectItem>
                                 ))}
                             </SelectContent>
                         </Select>
 
                         <Button
-                            onClick={handleAddMovement}
+                            onClick={()=>handleAddMovement('C')}
                             disabled={!selectedFundId}
                         >
-                            Nuovo Movimento
+                            <div className="flex items-center gap-2">
+                                <div className={`w-4 text-white font-medium h-4 rounded-full bg-red-600`}></div>
+                                <span className="font-medium">
+                                    Aggiungi Costo
+                                </span>
+                            </div>
                         </Button>
+                        <Button
+                            onClick={()=>handleAddMovement('R')}
+                            disabled={!selectedFundId}
+                        >
+                            <div className="flex items-center gap-2">
+                                <div className={`w-4 text-white font-medium h-4 rounded-full bg-green-600`}></div>
+                                <span className="font-medium">
+                                    Aggiungi Ricavo
+                                </span>
+                            </div>
+                        </Button>
+
+                    </div>
+                    <div className="mt-4 flex gap-4">
+                        <p>
+                            <strong>
+                                Importo attuale:
+                            </strong> {CurrencyEur.getInstance().format(selectedFundAmount)}
+                        </p>
                     </div>
                 </CardContent>
             </Card>
@@ -155,20 +168,21 @@ export default function Movimenti() {
                 <MovementsTable
                     movements={movements}
                     onEdit={handleEditMovement}
-                    onDelete={handleDeleteMovement}
+                    onDelete={deleteMovement}
                 />
             )}
 
             {isFormOpen && currentMovement && (
                 <MovementForm
                     movement={currentMovement}
-                    onSave={handleSaveMovement}
+                    onSave={saveMovement}
                     onCancel={() => {
                         setIsFormOpen(false);
                         setCurrentMovement(null);
                     }}
                     isOpen={isFormOpen}
                     setIsOpen={setIsFormOpen}
+                    nature={selectedNature}
                 />
             )}
         </div>
