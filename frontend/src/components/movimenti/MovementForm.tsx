@@ -11,6 +11,7 @@ import type EconomicCategoryDto from "@/dto/finance/EconomicCategoryDto.ts";
 import EconomicCategoryService from "@/service/EconomicCategoryService.ts";
 import EconomicAccountService from "@/service/EconomicAccountService.ts";
 import BulletAndLabelNature from "@/components/common/BulletAndLabelNature.tsx";
+import DateUtils from "@/lib/DateUtils.ts";
 
 interface MovementFormProps {
     movement: MovementDto;
@@ -78,7 +79,7 @@ export default function MovementForm({ movement, onSave, onCancel, isOpen, setIs
                             <Input
                                 id="date"
                                 type="date"
-                                value={formData.dt ? new Date(formData.dt).toISOString().split('T')[0] : ''}
+                                value={formData.dt ? DateUtils.formatDate(formData.dt) : ''}
                                 onChange={(e) => handleChange('dt', new Date(e.target.value))}
                                 required
                             />

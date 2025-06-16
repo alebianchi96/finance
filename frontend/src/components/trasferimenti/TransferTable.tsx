@@ -4,11 +4,12 @@ import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
 import MovementDto from "@/dto/finance/MovementDto";
 import CurrencyEur from "@/lib/CurrencyEur.ts";
+import type TransferMovementDto from "@/dto/finance/TransferMovementDto.ts";
 
 interface TransferTableProps {
-    transfers: MovementDto[];
-    onEdit: (id: number) => void;
-    onDelete: (id: number) => void;
+    transfers: TransferMovementDto[];
+    onEdit: (transfer: TransferMovementDto) => void;
+    onDelete: (transfer: TransferMovementDto) => void;
 }
 
 export default function TransferTable({ transfers, onEdit, onDelete }: TransferTableProps) {
@@ -18,8 +19,8 @@ export default function TransferTable({ transfers, onEdit, onDelete }: TransferT
             <TableHeader>
                 <TableRow>
                     <TableHead>Data</TableHead>
-                    <TableHead>Da Fondo</TableHead>
-                    <TableHead>A Fondo</TableHead>
+                    <TableHead>Da</TableHead>
+                    <TableHead>A</TableHead>
                     <TableHead className="text-right">Importo</TableHead>
                     <TableHead>Note</TableHead>
                     <TableHead className="text-center">Azioni</TableHead>
@@ -36,20 +37,28 @@ export default function TransferTable({ transfers, onEdit, onDelete }: TransferT
                     transfers.map(transfer => (
                         <TableRow key={transfer.id}>
                             <TableCell>{format(new Date(transfer.dt), 'dd/MM/yyyy')}</TableCell>
-                            <TableCell>{transfer.fromPatrimonialFund?.name}</TableCell>
-                            <TableCell>{transfer.patrimonialFund?.name}</TableCell>
+                            <TableCell>{transfer.patrimonialFundFrom?.label}</TableCell>
+                            <TableCell>{transfer.patrimonialFundTo?.label}</TableCell>
                             <TableCell className="text-right">{
                                 CurrencyEur.getInstance().format(Math.abs(transfer.amount))
                             }</TableCell>
                             <TableCell>{transfer.note}</TableCell>
                             <TableCell>
                                 <div className="flex justify-center gap-2">
-                                    <Button variant="outline" size="sm" onClick={() => onEdit(transfer.id)}>
-                                        Modifica
-                                    </Button>
-                                    <Button variant="destructive" size="sm" onClick={() => onDelete(transfer.id)}>
-                                        Elimina
-                                    </Button>
+                                    {
+                                        transfer.patrimonialFundFrom ?
+                                            (
+                                            <>
+                                            <Button variant="outline" size="sm" onClick={() => onEdit(transfer)}>
+                                                Modifica
+                                            </Button>
+                                            <Button variant="destructive" size="sm" onClick={() => onDelete(transfer)}>
+                                                Elimina
+                                            </Button>
+                                            </>
+                                            ) : (<></>)
+                                    }
+
                                 </div>
                             </TableCell>
                         </TableRow>

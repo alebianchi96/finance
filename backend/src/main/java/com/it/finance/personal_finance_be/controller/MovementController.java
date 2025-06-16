@@ -1,6 +1,7 @@
 package com.it.finance.personal_finance_be.controller;
 
 import com.it.finance.personal_finance_be.dto.MovementDto;
+import com.it.finance.personal_finance_be.dto.TransferMovementDto;
 import com.it.finance.personal_finance_be.entity.MovementEntity;
 import com.it.finance.personal_finance_be.framework.*;
 import com.it.finance.personal_finance_be.service.MovementService;
@@ -54,18 +55,6 @@ public class MovementController extends PfController<MovementEntity, MovementDto
         }
     }
 
-    @PostMapping("/search/transfers")
-    public ResponseEntity<PfObjectApiResponse<SearchResponseDto<MovementDto>>> apiSearchTransfers(@RequestBody SearchRequestDto<MovementDto> searchRequest) {
-        try {
-            SearchResponseDto<MovementDto> response = service.searchTransfers(searchRequest);
-            return ResponseEntity.ok(PfObjectApiResponse.ok(response));
-        } catch (PfUnexpectedException e) {
-            return ResponseEntity.ok(PfObjectApiResponse.ko(
-                    e.getCode(), e.getInternalCode(), e.getMessage()
-            ));
-        }
-    }
-
     @Override
     @PostMapping("/insert")
     public ResponseEntity<PfObjectApiResponse<MovementDto>> apiInsert(@RequestBody MovementDto dto) {
@@ -82,6 +71,57 @@ public class MovementController extends PfController<MovementEntity, MovementDto
     @DeleteMapping("/id/{id}")
     public ResponseEntity<PfObjectApiResponse<Void>> apiDelete(@PathVariable Long id) {
         return super.delete(id);
+    }
+
+
+    // trasferimenti
+    @PostMapping("/search/transfers")
+    public ResponseEntity<PfObjectApiResponse<SearchResponseDto<TransferMovementDto>>> apiSearchTransfers(
+            @RequestBody SearchRequestDto<TransferMovementDto> searchRequest) {
+        try {
+            SearchResponseDto<TransferMovementDto> response = service.searchTransfers(searchRequest);
+            return ResponseEntity.ok(PfObjectApiResponse.ok(response));
+        } catch (PfUnexpectedException e) {
+            return ResponseEntity.ok(PfObjectApiResponse.ko(
+                    e.getCode(), e.getInternalCode(), e.getMessage()
+            ));
+        }
+    }
+
+    @PostMapping("/transfers/insert")
+    public ResponseEntity<PfObjectApiResponse<TransferMovementDto>> apiTransferInsert(@RequestBody TransferMovementDto dto) {
+        try {
+            TransferMovementDto savedDto = service.transferInsert(dto);
+            return ResponseEntity.ok(PfObjectApiResponse.ok(savedDto));
+        } catch (PfUnexpectedException e) {
+            return ResponseEntity.ok(PfObjectApiResponse.ko(
+                    e.getCode(), e.getInternalCode(), e.getMessage()
+            ));
+        }
+    }
+
+    @PutMapping("/transfers/edit")
+    public ResponseEntity<PfObjectApiResponse<TransferMovementDto>> apiTransferEdit(@RequestBody TransferMovementDto dto) {
+        try {
+            TransferMovementDto updatedDto = service.transferEdit(dto);
+            return ResponseEntity.ok(PfObjectApiResponse.ok(updatedDto));
+        } catch (PfUnexpectedException e) {
+            return ResponseEntity.ok(PfObjectApiResponse.ko(
+                    e.getCode(), e.getInternalCode(), e.getMessage()
+            ));
+        }
+    }
+
+    @DeleteMapping("/transfers/block-id/{blockId}")
+    public ResponseEntity<PfObjectApiResponse<Void>> apiTransferDelete(@PathVariable Long blockId) {
+        try {
+            service.transferDelete(blockId);
+            return ResponseEntity.ok(PfObjectApiResponse.ok(null));
+        } catch (PfUnexpectedException e) {
+            return ResponseEntity.ok(PfObjectApiResponse.ko(
+                    e.getCode(), e.getInternalCode(), e.getMessage()
+            ));
+        }
     }
 
 

@@ -4,8 +4,9 @@ import SearchRequestDto from "@/dto/framework/SearchRequestDto.ts";
 import PatrimonialFundDto from "@/dto/finance/PatrimonialFundDto.ts";
 import type PfObjectApiResponse from "@/dto/framework/PfObjectApiResponse.ts";
 import type SearchResponseDto from "@/dto/framework/SearchResponseDto.ts";
+import TransferMovementDto from "@/dto/finance/TransferMovementDto.ts";
 
-export default class MovementService extends PfService<MovementDto>{
+export default class MovementService extends PfService<MovementDto> {
 
     getDomain(): string {
         return "movements";
@@ -20,58 +21,81 @@ export default class MovementService extends PfService<MovementDto>{
         return this.instance;
     }
 
-    async load(idPatrimonialFund: string | undefined, page:number | undefined, size:number | undefined, setState: Function) {
+    async loadEconomicMovementsByPatrimonialFund(idPatrimonialFund: string | undefined, setState: Function) {
         const searchRequest = new SearchRequestDto<MovementDto>();
         searchRequest.dto = new MovementDto();
-        searchRequest.size = size ?? 999999
-        searchRequest.page = page ?? 1;
 
         if(idPatrimonialFund) {
             searchRequest.dto.patrimonialFund = new PatrimonialFundDto();
             searchRequest.dto.patrimonialFund.id = parseInt(idPatrimonialFund);
         }
 
-        let response : PfObjectApiResponse<SearchResponseDto<MovementDto>> = await this.search(searchRequest);
-        let lst = response?.dto?.list || [];
-        if(lst) {
-            lst.sort((a, b) => {
-
-                if( a.dt !== b.dt ) {
-                    return a.dt < b.dt ? -1 : 1;
-                }
-
-                return (a.createdAt.getTime() - b.createdAt.getTime()) < 0 ? -1 : 1;
-            });
-        }
-        setState( lst );
-
-    }
-
-    private async search_(searchRequest:SearchRequestDto<MovementDto>, endpoint : string):Promise<PfObjectApiResponse<SearchResponseDto<MovementDto>>> {
-        // @PostMapping("/search")
-        const response = await fetch(`${this.getBackendUrl()}/${this.getDomain()}/search/${endpoint}`, {
+        const responseWrapped = await fetch(`${this.getBackendUrl()}/${this.getDomain()}/search/economics`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify(searchRequest)
         });
-        return await this.readResponse(response);
-    }
+        let response = await this.readResponse(responseWrapped);
 
-    async loadMovementsByPatrimonialFundAndType(idPatrimonialFund: string | undefined, type : string,  setState: Function) {
-        const searchRequest = new SearchRequestDto<MovementDto>();
-        searchRequest.dto = new MovementDto();
 
-        if(idPatrimonialFund) {
-            searchRequest.dto.patrimonialFund = new PatrimonialFundDto();
-            searchRequest.dto.patrimonialFund.id = parseInt(idPatrimonialFund);
-        }
-
-        let response : PfObjectApiResponse<SearchResponseDto<MovementDto>> = await this.search_(searchRequest, type);
         let lst = response?.dto?.list || [];
         setState( lst );
 
+    }
+
+    async loadTransferMovements(setState: Function) {
+
+        const searchRequest = new SearchRequestDto<TransferMovementDto>();
+        searchRequest.dto = new TransferMovementDto();
+
+        const responseWrapped = await fetch(`${this.getBackendUrl()}/${this.getDomain()}/search/transfers`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(searchRequest)
+        });
+        let response = await this.readResponse(responseWrapped);
+
+        let lst = response?.dto?.list || [];
+        setState( lst );
+
+    }
+
+    async transferInsert(dto:TransferMovementDto):Promise<PfObjectApiResponse<TransferMovementDto>> {
+        // @PostMapping("/insert")
+        const response = await fetch(`${this.getBackendUrl()}/${this.getDomain()}/transfers/insert`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(dto)
+        });
+
+        return await this.readResponse(response);
+    }
+
+    async transferEdit(dto:TransferMovementDto):Promise<PfObjectApiResponse<TransferMovementDto>> {
+        // @PutMapping("/edit")
+        const response = await fetch(`${this.getBackendUrl()}/${this.getDomain()}/transfers/edit`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(dto)
+        });
+
+        return await this.readResponse(response);
+    }
+
+    async transferDelete(blockId:number):Promise<PfObjectApiResponse<void>> {
+        // @DeleteMapping("/id/{id}")
+        const response = await fetch(`${this.getBackendUrl()}/${this.getDomain()}/transfers/block-id/${blockId}`, {
+            method: 'DELETE'
+        });
+        return await this.readResponse(response);
     }
 
 }

@@ -1,6 +1,7 @@
 package com.it.finance.personal_finance_be.dao;
 
 import com.it.finance.personal_finance_be.entity.MovementEntity;
+import com.it.finance.personal_finance_be.entity.TransferMovementEntityView;
 import com.it.finance.personal_finance_be.framework.PfRepository;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
@@ -23,11 +24,5 @@ public interface MovementJpaRepo extends PfRepository<MovementEntity> {
             " ORDER BY m.dt DESC")
     List<MovementEntity> listLatestEconomicsByPatrimonialFundAndDtLessThanEqual(Long idPatrimonialFund, LocalDateTime dtTo, Pageable pageable);
 
-    @Query("SELECT m FROM MovementEntity m " +
-            " WHERE m.patrimonialFund.id = :idPatrimonialFund " +
-            " AND m.dt <= :dtTo " +
-            " AND m.economicAccount IS NULL " +
-            " ORDER BY m.dt DESC")
-    List<MovementEntity> listLatestTransfersByPatrimonialFundAndDtLessThanEqual(Long idPatrimonialFund, LocalDateTime dtTo, Pageable pageable);
-
+    List<MovementEntity> findAllByBlockId(Long blockId);
 }

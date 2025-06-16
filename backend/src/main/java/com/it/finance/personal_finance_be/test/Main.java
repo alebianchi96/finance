@@ -1,5 +1,6 @@
 package com.it.finance.personal_finance_be.test;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 
@@ -7,13 +8,11 @@ public class Main {
 
     public static void main(String[] args) {
 
-        Long dtTimestamp = 1749393461571L;
+        BigDecimal amount = BigDecimal.valueOf(1000.00);
 
-        LocalDateTime dt = LocalDateTime.ofEpochSecond(
-                dtTimestamp / 1000, 0, java.time.ZoneOffset.UTC);
+        System.out.println("Positive: " + (amount.compareTo(BigDecimal.ZERO) > 0)); // true if amount is greater than zero
 
-
-        System.out.println(dt);
+        System.out.println("Negative: " + (amount.compareTo(BigDecimal.ZERO) < 0));
 
 
     }

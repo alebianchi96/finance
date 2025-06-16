@@ -34,7 +34,7 @@ export default function Movimenti() {
     // Caricamento dei movimenti quando cambia il fondo selezionato
     useEffect(() => {
         if (!selectedFundId) return;
-        movementService.loadMovementsByPatrimonialFundAndType(selectedFundId, "economics",  setMovements);
+        movementService.loadEconomicMovementsByPatrimonialFund(selectedFundId, setMovements);
         patrimonialFundService.fundAmountByIdAtDate(selectedFundId, new Date(), setSelectedFundAmount);
     }, [selectedFundId]);
 
@@ -67,7 +67,8 @@ export default function Movimenti() {
 
     const deleteMovement = async (id: number) => {
         await movementService.delete(id);
-        movementService.loadMovementsByPatrimonialFundAndType(selectedFundId, "economics",  setMovements);
+        movementService.loadEconomicMovementsByPatrimonialFund(selectedFundId, setMovements);
+        patrimonialFundService.fundAmountByIdAtDate(selectedFundId, new Date(), setSelectedFundAmount);
     };
 
     const saveMovement = async (movement: MovementDto) => {
@@ -89,7 +90,8 @@ export default function Movimenti() {
             await movementService.insert(movement);
         }
         setIsFormOpen(false);
-        await movementService.loadMovementsByPatrimonialFundAndType(selectedFundId, "economics",  setMovements);
+        await movementService.loadEconomicMovementsByPatrimonialFund(selectedFundId, setMovements);
+        patrimonialFundService.fundAmountByIdAtDate(selectedFundId, new Date(), setSelectedFundAmount);
     };
 
     return (

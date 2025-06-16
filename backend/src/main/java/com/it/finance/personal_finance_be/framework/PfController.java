@@ -1,6 +1,7 @@
 package com.it.finance.personal_finance_be.framework;
 
 
+import com.it.finance.personal_finance_be.dto.TransferMovementDto;
 import org.springframework.http.ResponseEntity;
 
 import java.util.List;
@@ -83,6 +84,5 @@ public abstract class PfController<E extends PfEntity, DTO extends PfDto> {
     }
 
     public abstract ResponseEntity<PfObjectApiResponse<Void>> apiDelete(Long id);
-
 
 }

@@ -1,90 +1,60 @@
 // src/pages/Trasferimenti.tsx
-import { useState, useEffect } from "react";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import {useEffect, useState} from "react";
+import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
+import {Button} from "@/components/ui/button";
 import TransferForm from "@/components/trasferimenti/TransferForm";
 import TransferTable from "@/components/trasferimenti/TransferTable";
-import PatrimonialFundDto from "@/dto/finance/PatrimonialFundDto";
 import MovementDto from "@/dto/finance/MovementDto";
+import PatrimonialFundDto from "@/dto/finance/PatrimonialFundDto.ts";
+import TransferMovementDto from "@/dto/finance/TransferMovementDto.ts";
+import PatrimonialFundService from "@/service/PatrimonialFundService.ts";
+import MovementService from "@/service/MovementService.ts";
 
 export default function Trasferimenti() {
-    const [transfers, setTransfers] = useState<MovementDto[]>([]);
+
+    const [patrimonialFunds, setPatrimonialFunds] = useState<PatrimonialFundDto[]>([]);
+    const [transfers, setTransfers] = useState<TransferMovementDto[]>([]);
     const [isFormOpen, setIsFormOpen] = useState(false);
-    const [currentTransfer, setCurrentTransfer] = useState<{
-        sourceMovement: MovementDto;
-        destinationMovement: MovementDto;
-    } | null>(null);
+
+    const [currentTransfer, setCurrentTransfer] = useState<TransferMovementDto | null>(null);
+
+    const patrimonialFundService = PatrimonialFundService.getInstance();
+    const movementService = MovementService.getInstance();
+
 
     useEffect(() => {
-        loadTransfers();
+        movementService.loadTransferMovements(setTransfers);
+        patrimonialFundService.load(undefined, setPatrimonialFunds);
     }, []);
 
-    const loadTransfers = async () => {
-        try {
-            const response = await fetch("/api/transfers");
-            if (response.ok) {
-                const data = await response.json();
-                setTransfers(data);
-            }
-        } catch (error) {
-            console.error("Errore durante il caricamento dei trasferimenti:", error);
-        }
-    };
-
     const handleAddTransfer = () => {
-        setCurrentTransfer({
-            sourceMovement: new MovementDto(),
-            destinationMovement: new MovementDto()
-        });
+        let newTransfer = new TransferMovementDto();
+        newTransfer.dt = transfers.reduce((max, m) => m.dt && m.dt > max ? m.dt : max, new Date());
+        setCurrentTransfer(newTransfer);
         setIsFormOpen(true);
     };
 
-    const handleEditTransfer = (transferId: number) => {
-        // In una situazione reale, qui dovremmo caricare i dettagli del trasferimento specifico
-        fetch(`/api/transfers/${transferId}`)
-            .then(res => res.json())
-            .then(data => {
-                setCurrentTransfer(data);
-                setIsFormOpen(true);
-            });
-    };
+    const handleEditTransfer = async (transfer: TransferMovementDto) => {
+        setCurrentTransfer(transfer);
+        setIsFormOpen(true);
+    }
 
-    const handleDeleteTransfer = async (id: number) => {
-        try {
-            const response = await fetch(`/api/transfers/${id}`, {
-                method: "DELETE"
-            });
-
-            if (response.ok) {
-                loadTransfers();
-            }
-        } catch (error) {
-            console.error("Errore durante l'eliminazione del trasferimento:", error);
+    const saveTransfer = async (transfer: TransferMovementDto) => {
+        if(transfer.id) {
+            // Aggiorna il movimento esistente
+            await movementService.transferEdit(transfer);
+        } else {
+            // Crea un nuovo movimento
+            await movementService.transferInsert(transfer);
         }
-    };
+        setIsFormOpen(false);
+        await movementService.loadTransferMovements(setTransfers);
+    }
 
-    const handleSaveTransfer = async (transfer: {
-        sourceMovement: MovementDto;
-        destinationMovement: MovementDto;
-    }) => {
-        try {
-            const response = await fetch("/api/transfers", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(transfer)
-            });
-
-            if (response.ok) {
-                setIsFormOpen(false);
-                setCurrentTransfer(null);
-                loadTransfers();
-            }
-        } catch (error) {
-            console.error("Errore durante il salvataggio del trasferimento:", error);
-        }
-    };
+    const deleteTransfer = async (transfer: TransferMovementDto) => {
+        await movementService.transferDelete(transfer.id);
+        await movementService.loadTransferMovements(setTransfers);
+    }
 
     return (
         <div className="space-y-8 w-full bg-background text-foreground">
@@ -101,15 +71,16 @@ export default function Trasferimenti() {
                     <TransferTable
                         transfers={transfers}
                         onEdit={handleEditTransfer}
-                        onDelete={handleDeleteTransfer}
+                        onDelete={deleteTransfer}
                     />
                 </CardContent>
             </Card>
 
             {isFormOpen && currentTransfer && (
                 <TransferForm
+                    patrimonialFunds={patrimonialFunds}
                     transfer={currentTransfer}
-                    onSave={handleSaveTransfer}
+                    onSave={saveTransfer}
                     onCancel={() => {
                         setIsFormOpen(false);
                         setCurrentTransfer(null);
