@@ -1,18 +1,23 @@
 package com.it.finance.personal_finance_be.test;
 
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 
 
 public class Main {
 
     public static void main(String[] args) {
 
-        BigDecimal amount = BigDecimal.valueOf(1000.00);
+        Long tmst = 1735599600000L;
 
-        System.out.println("Positive: " + (amount.compareTo(BigDecimal.ZERO) > 0)); // true if amount is greater than zero
+        LocalDateTime ldt = Instant.ofEpochMilli(tmst)
+                .atZone(ZoneId.systemDefault())
+                .toLocalDateTime();
 
-        System.out.println("Negative: " + (amount.compareTo(BigDecimal.ZERO) < 0));
+        System.out.println(ldt); // true if amount is greater than zero
 
 
     }

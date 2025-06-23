@@ -3,6 +3,7 @@ package com.it.finance.personal_finance_be.controller;
 import com.it.finance.personal_finance_be.dto.PatrimonialFundDto;
 import com.it.finance.personal_finance_be.entity.PatrimonialFundEntity;
 import com.it.finance.personal_finance_be.framework.*;
+import com.it.finance.personal_finance_be.framework.utilities.DateUtils;
 import com.it.finance.personal_finance_be.service.PatrimonialFundService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -67,7 +68,9 @@ public class PatrimonialFundController extends PfController<PatrimonialFundEntit
             @PathVariable Long dtTimestamp
     ) {
 
-        LocalDateTime dt = LocalDateTime.ofEpochSecond(dtTimestamp / 1000, 0, java.time.ZoneOffset.UTC);
+        LocalDateTime dt = DateUtils.toLocalDateTime(dtTimestamp);
+        dt = dt.plusDays(1);
+        dt = dt.withHour(0).withMinute(0).withSecond(0).withNano(0);
 
         try {
             BigDecimal amount = service.sumAmountByIdAndDtLessThanEqual(id, dt);

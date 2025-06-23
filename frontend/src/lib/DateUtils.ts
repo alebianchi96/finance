@@ -23,4 +23,15 @@ export default class DateUtils {
         return formattedDate;
     }
 
+    static getMonthName(d:Date): string {
+        if(!d) { return ""; }
+
+        const monthNames = [
+            "Gennaio", "Febbraio", "Marzo", "Aprile", "Maggio", "Giugno",
+            "Luglio", "Agosto", "Settembre", "Ottobre", "Novembre", "Dicembre"
+        ];
+
+        return monthNames[d.getMonth()];
+    }
+
 }

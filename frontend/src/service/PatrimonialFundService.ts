@@ -41,10 +41,15 @@ export default class PatrimonialFundService extends PfService<PatrimonialFundDto
     }
 
     async fundAmountByIdAtDate(idPatrimonialFund: string, dt : Date,  setState: Function) {
-        const response = await fetch(`${this.getBackendUrl()}/${this.getDomain()}/fund/${idPatrimonialFund}/at/${dt.getTime()}`);
-        let res = await this.readResponse(response);
-        // console.log("Fund amount: ", res.dto)
-        setState(res.dto || 0);
+        try{
+            const response = await fetch(
+                `${this.getBackendUrl()}/${this.getDomain()}/fund/${idPatrimonialFund}/at/${dt.getTime()}`);
+            let res = await this.readResponse(response);
+            // console.log("Fund amount: ", res.dto)
+            setState(res.dto || 0);
+        } catch (err:any) {
+            return await this.manageError(err);
+        }
     }
 
 
