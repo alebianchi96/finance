@@ -34,4 +34,17 @@ export default class DateUtils {
         return monthNames[d.getMonth()];
     }
 
+    static parse(yyyyMMdd: string|undefined): Date|undefined {
+        if(!yyyyMMdd) { return undefined; }
+        if(yyyyMMdd.indexOf("-") === -1) {
+            return undefined;
+        }
+        let arr = yyyyMMdd.split("-");
+        return new Date(
+            parseInt(arr[0]),
+            parseInt(arr[1]) - 1, // Mese in JavaScript è zero-based
+            parseInt(arr[2]) // Giorno
+        );
+    }
+
 }

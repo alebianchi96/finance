@@ -8,6 +8,7 @@ import EconomicAccountDto from "@/dto/finance/report/EconomicResultDto.ts";
 import CurrencyEur from "@/lib/CurrencyEur.ts";
 import type PatrimonialResultDto from "@/dto/finance/report/PatrimonialResultDto.ts";
 import DateUtils from "@/lib/DateUtils.ts";
+import moment from "moment";
 
 export default function Dashboard() {
 
@@ -26,14 +27,6 @@ export default function Dashboard() {
     const navigate = useNavigate();
 
     const reportService = ReportService.getInstance();
-
-    // Date state
-    const today = new Date();
-    const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
-
-    const [economicFrom, setEconomicFrom] = useState(firstDayOfMonth.toISOString().slice(0, 10));
-    const [economicTo, setEconomicTo] = useState(today.toISOString().slice(0, 10));
-    const [patrimonialDate, setPatrimonialDate] = useState(today.toISOString().slice(0, 10));
 
     // Results state
     const [currentMonthEconomicResult, setCurrentMonthEconomicResult] = useState<EconomicAccountDto | null>(null);
@@ -72,18 +65,58 @@ export default function Dashboard() {
         setYearStartPatrimonialResult(response?.dto);
     }
 
+
+
+    const setDateState = async ( value:string, setFunc:Function ) => {
+        // console.log("> Value to set: ", value);
+        // let valueToSet = value;
+        setFunc(value)
+    }
+
+
+    // Date state
+    const [economicFrom, setEconomicFrom] = useState();
+    const [economicTo, setEconomicTo] = useState();
+    const [patrimonialDate, setPatrimonialDate] = useState();
+
+    const getStartOfMonthDate = ()=>{
+        let startMonth = new Date();
+        startMonth.setDate(1);
+        return startMonth;
+    }
+
     const retrieveEconomicResult = async () => {
-        const from = new Date(economicFrom);
-        const to = new Date(economicTo);
+
+        // console.log("> economic_state: ", { economicFrom, economicTo });
+
+        let startMonth = getStartOfMonthDate();
+        let now = new Date();
+
+        const from = DateUtils.parse(economicFrom) ?? startMonth;
+        const to = DateUtils.parse(economicTo) ?? now;
+
+        // console.log("> economic_date: ", { from, to });
+
         const response = await reportService.getEconomicResult(from, to);
         setEconomicResult(response?.dto);
     };
 
     const retrievePatrimonialResult = async () => {
-        const ref = new Date(patrimonialDate);
+
+        // console.log("> patrimonial_state: ", {patrimonialDate});
+
+        const ref = DateUtils.parse(patrimonialDate) ?? new Date();
+
+        // console.log("> patrimonial_filter: ", {ref})
+
         const response = await reportService.getPatrimonialResult(ref);
         setPatrimonialResult(response?.dto);
     };
+
+
+
+
+
 
     React.useEffect(()=>{
         retrieveEconomicResult();
@@ -98,9 +131,11 @@ export default function Dashboard() {
      const CardAmount = ({ title, description, amount, styled }
                          : { title: string; description: string; amount: number; styled:boolean|undefined }) => {
 
-        const RED_DOT = <div className={`w-4 text-white font-medium h-4 rounded-full blinking-dot bg-red-600`}></div>
+        const dotClasses = "w-4 text-white font-medium h-4 rounded-full blinking-dot";
 
-        const GREEN_DOT = <div className={`w-4 text-white font-medium h-4 rounded-full blinking-dot bg-green-600`}></div>
+        const RED_DOT = <div className={`${dotClasses} bg-red-600`}></div>
+
+        const GREEN_DOT = <div className={`${dotClasses} bg-green-600`}></div>
 
         let DTO_OBJ = <></>
 
@@ -160,8 +195,8 @@ export default function Dashboard() {
                             <label>Da: </label>
                             <input
                                 type="date"
-                                value={economicFrom}
-                                onChange={e => setEconomicFrom(e.target.value)}
+                                value={economicFrom ?? DateUtils.formatDate(getStartOfMonthDate())}
+                                onChange={e => setDateState(e.target.value, setEconomicFrom)}
                                 className="border rounded px-2 py-1"
                             />
                         </div>
@@ -169,8 +204,8 @@ export default function Dashboard() {
                             <label>A: </label>
                             <input
                                 type="date"
-                                value={economicTo}
-                                onChange={e => setEconomicTo(e.target.value)}
+                                value={economicTo ?? DateUtils.formatDate(new Date())}
+                                onChange={e => setDateState(e.target.value, setEconomicTo)}
                                 className="border rounded px-2 py-1"
                             />
                         </div>
@@ -199,8 +234,8 @@ export default function Dashboard() {
                             <label>Data: </label>
                             <input
                                 type="date"
-                                value={patrimonialDate}
-                                onChange={e => setPatrimonialDate(e.target.value)}
+                                value={patrimonialDate ?? DateUtils.formatDate(new Date())}
+                                onChange={e => setDateState(e.target.value, setPatrimonialDate)}
                                 className="border rounded px-2 py-1"
                             />
                         </div>
