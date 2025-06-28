@@ -8,13 +8,10 @@ import EconomicAccountDto from "@/dto/finance/report/EconomicResultDto.ts";
 import CurrencyEur from "@/lib/CurrencyEur.ts";
 import type PatrimonialResultDto from "@/dto/finance/report/PatrimonialResultDto.ts";
 import DateUtils from "@/lib/DateUtils.ts";
-import moment from "moment";
 
 export default function Dashboard() {
 
 /*
-
--> Sistema date su input dei risultati (problema con fuso) / testare le chiamate che passino le date giuste
 
 -> Rilascio
 
