@@ -1,6 +1,7 @@
 package com.it.finance.personal_finance_be.controller;
 
 import com.it.finance.personal_finance_be.dto.PatrimonialFundDto;
+import com.it.finance.personal_finance_be.dto.PatrimonialFundInitDto;
 import com.it.finance.personal_finance_be.entity.PatrimonialFundEntity;
 import com.it.finance.personal_finance_be.framework.*;
 import com.it.finance.personal_finance_be.framework.utilities.DateUtils;
@@ -75,6 +76,22 @@ public class PatrimonialFundController extends PfController<PatrimonialFundEntit
         try {
             BigDecimal amount = service.sumAmountByIdAndDtLessThanEqual(id, dt);
             return ResponseEntity.ok(PfObjectApiResponse.ok(amount));
+        } catch (PfUnexpectedException e) {
+            return ResponseEntity.ok(PfObjectApiResponse.ko(
+                    e.getCode(), e.getInternalCode(), e.getMessage()
+            ));
+        }
+    }
+
+
+    // Ricerca dei patrimonial funds con relativo saldo iniziale
+    @PostMapping("/search-with-init")
+    public ResponseEntity<PfObjectApiResponse<SearchResponseDto<PatrimonialFundInitDto>>> apiSearchWithInit(
+            @RequestBody SearchRequestDto<PatrimonialFundDto> searchRequest) {
+        try {
+            SearchResponseDto<PatrimonialFundInitDto> response = service
+                    .searchWithInit(searchRequest);
+            return ResponseEntity.ok(PfObjectApiResponse.ok(response));
         } catch (PfUnexpectedException e) {
             return ResponseEntity.ok(PfObjectApiResponse.ko(
                     e.getCode(), e.getInternalCode(), e.getMessage()

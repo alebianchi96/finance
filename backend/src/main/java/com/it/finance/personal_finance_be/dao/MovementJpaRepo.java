@@ -45,6 +45,9 @@ public interface MovementJpaRepo extends PfRepository<MovementEntity> {
             " GROUP BY m.patrimonialFund ")
     List<PatrimonialFundSumModel> sumPatrimonialFundsUntilDate(LocalDateTime dtRef);
 
-
-
+    @Query("SELECT m " +
+            " FROM MovementEntity m " +
+            " WHERE m.patrimonialFund.id = :idPatrimonialFund " +
+            " AND m.note = :initNote")
+    MovementEntity findSaldoInizialeByPatrimonialFundId(Long idPatrimonialFund, String initNote);
 }

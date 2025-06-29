@@ -1,5 +1,6 @@
 package com.it.finance.personal_finance_be.framework;
 
+import com.it.finance.personal_finance_be.dto.PatrimonialFundInitDto;
 import org.springframework.data.domain.*;
 
 import java.time.LocalDateTime;
@@ -123,6 +124,5 @@ public abstract class PfService<E extends PfEntity, DTO extends PfDto> {
         }
         getRepository().delete(entity);
     }
-
 
 }
