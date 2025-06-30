@@ -1,8 +1,6 @@
 import { serve } from "bun";
 import index from "./index.html";
 
-
-
 const server = serve({
   routes: {
     // Serve index.html for all unmatched routes.
@@ -19,6 +17,4 @@ const server = serve({
 });
 
 // Bun.env.NODE_TLS_REJECT_UNAUTHORIZED=String(0);
-
-
 console.log(`🚀 Server running at ${server.url}`);

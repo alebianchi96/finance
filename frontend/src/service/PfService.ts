@@ -4,10 +4,15 @@ import type SearchRequestDto from "@/dto/framework/SearchRequestDto.ts";
 import type PfDto from "@/dto/framework/PfDto.ts";
 import type SearchResponseDto from "@/dto/framework/SearchResponseDto.ts";
 import CustomAlert from "@/components/custom/CustomAlert.ts";
+import * as process from "node:process";
 
 export default abstract class PfService<DTO extends PfDto> {
 
-    protected getBackendUrl() { return "http://localhost:8080" }
+    protected getBackendUrl() {
+        let port = "8281";
+        let bu = `http://localhost:${port}`
+        return bu;
+    }
 
     abstract getDomain() : string;
 

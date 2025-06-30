@@ -4,4 +4,6 @@ categories_accounts.txt
 
 structure/volume
 
+backend/src/main/resources/static/*
+
 frontend/node_modules

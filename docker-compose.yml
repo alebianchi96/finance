@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:14.4
+    container_name: personal_finance_db_prod
+    restart: always
+    environment:
+      POSTGRES_USER: alepf
+      POSTGRES_PASSWORD: alepf
+      POSTGRES_DB: personal_finance_db
+    ports:
+      - "8280:5432"
+    volumes:
+      - C:/Users/alexb/me/personal_info/finance/structure/volume/database-prod:/var/lib/postgresql/data
+  backend:
+    container_name: personal_finance_service_prod
+    build:
+      context: ./backend/
+      dockerfile: Dockerfile
+    environment:
+        DB_HOST: postgres
+    depends_on:
+      - postgres
+    ports:
+      - 8281:8281
