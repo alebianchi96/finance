@@ -16,7 +16,7 @@ services:
   backend:
     container_name: personal_finance_service_prod
     build:
-      context: ./backend/
+      context: ../../backend
       dockerfile: Dockerfile
     environment:
         DB_HOST: postgres

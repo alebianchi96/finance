@@ -9,9 +9,6 @@ created_at  TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
 updated_at  TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- ALTER SEQUENCE economic_categories_id_seq RENAME TO economic_categories_seq;
-
-
 CREATE TABLE economic_accounts (
 id          BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
 code        VARCHAR(100) NOT NULL UNIQUE,
@@ -21,9 +18,6 @@ created_at  TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
 updated_at  TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- ALTER SEQUENCE economic_accounts_id_seq RENAME TO economic_accounts_seq;
-
-
 CREATE TABLE patrimonial_funds (
 id          BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
 code        VARCHAR(100) NOT NULL UNIQUE,
@@ -31,8 +25,6 @@ label       VARCHAR(255),
 created_at  TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
 updated_at  TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
-
--- ALTER SEQUENCE patrimonial_funds_id_seq RENAME TO patrimonial_funds_seq;
 
 CREATE TABLE movements (
 id          BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
@@ -46,5 +38,14 @@ updated_at  TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
 block_id    BIGINT NOT NULL
 );
 
-
--- ALTER SEQUENCE movements_id_seq RENAME TO movements_seq;
+create or replace view v_transfer_movements as
+select
+    m.block_id as id, m.created_at, m.updated_at, m.dt as dt, m.note,
+    m.id as id_to, m.fk_patrimonial_fund as fk_patrimonial_fund_to, m.amount,
+    mf.id as id_from, mf.fk_patrimonial_fund as fk_patrimonial_fund_from
+from movements m
+         left join movements mf on mf.block_id = m.block_id and mf.id <> m.id
+where m.amount > 0
+  and m.fk_economic_account is null
+order by m.dt desc
+;
