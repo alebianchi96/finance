@@ -8,4 +8,4 @@ backend/src/main/resources/static/*
 
 frontend/node_modules
 
-init_tpl/*
+init_tpl
