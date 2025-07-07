@@ -44,6 +44,12 @@
 
 ### 🎯 Congratulazioni, sei pronto per iniziare a utilizzare l'applicazione!
 
+### 📜 Note finali
+Una volta completata la prima installazione non sarà più necessario ripetere i passaggi di cui sopra.
+Laddove l'indirizzo ```http://localhost:8281/``` non risponda correttamente, accertare il corretto avvio di [![Docker][Docker.bdg]][Docker-url].
+
+Tutti i dati inseriti nel software verranno salvati solo localmente nella cartella ```C:/Users/{nome_utente}/personal_finance/database-prod``` 
+
 
 [React.js]: https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB
 [React-url]: https://reactjs.org/
