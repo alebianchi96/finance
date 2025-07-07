@@ -4,6 +4,8 @@
 @echo "########################################"
 @echo " "
 
+mkdir database-prod
+
 docker compose up -d
 
 pause
