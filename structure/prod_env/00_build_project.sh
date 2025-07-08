@@ -53,6 +53,7 @@ if [[ "$risposta" =~ ^[sS]$ ]]; then
 
   cd ../../backend
   docker build -t mixer812/personal-finance-service:$vv .
+  docker tag mixer812/personal-finance-service:$vv mixer812/personal-finance-service:latest
   echo "$vv" > ../structure/prod_env/latest_docker_version.info
 
   echo "Ecco la lista delle immagini docker per il servizio indicato:"
