@@ -71,3 +71,8 @@ if [[ "$risposta" =~ ^[sS]$ ]]; then
 fi
 
 cd ../structure/prod_env
+
+echo ""
+echo "###### ATTENZIONE ######"
+echo "Elimina dal pc in locale le immagini generate ma inutili!"
+echo "########################"
