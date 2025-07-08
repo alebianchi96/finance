@@ -12,13 +12,13 @@ services:
     ports:
       - "8280:5432"
     volumes:
-      - C:/Users/alexb/me/personal_info/finance/structure/volume/database-prod:/var/lib/postgresql/data
+      - zzBASEDIRECTORYzz:/var/lib/postgresql/data
   backend:
     container_name: personal_finance_service_prod
     # build:
       #   context: ../../backend
       #   dockerfile: Dockerfile
-    image: mixer812/personal-finance-service:0.0.3
+    image: mixer812/personal-finance-service:latest
     environment:
         DB_HOST: postgres
     depends_on:

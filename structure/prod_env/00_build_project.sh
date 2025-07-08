@@ -4,7 +4,7 @@
 #
 
 
-echo " "
+echo ""
 echo "#################################"
 echo "######### BUILD PROJECT #########"
 echo "#################################"
@@ -64,6 +64,7 @@ if [[ "$risposta" =~ ^[sS]$ ]]; then
   if [[ "$rispostaUpload" =~ ^[sS]$ ]]; then
     docker login
     docker push mixer812/personal-finance-service:$vv
+    docker push mixer812/personal-finance-service:latest
   fi
 
 fi
