@@ -3,6 +3,7 @@ categories_accounts.txt
 .idea/*
 
 structure/volume
+structure/dev_env/volume
 
 backend/src/main/resources/static/*
 

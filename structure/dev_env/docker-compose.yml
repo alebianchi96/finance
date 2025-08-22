@@ -12,4 +12,4 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - C:/Users/alexb/me/personal_info/finance/structure/volume/database:/var/lib/postgresql/data
+      - C:/Users/alexb/me/personal_info/finance/structure/dev_env/volume/database:/var/lib/postgresql/data

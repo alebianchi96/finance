@@ -1,5 +1,5 @@
 
-const baseUrl = 'http://localhost:8080';
+const baseUrl = 'http://localhost:8281';
 
 const controllerCategories = "economic-categories"
 const controllerAccounts = "economic-accounts"
@@ -8,8 +8,10 @@ const controllerPatrimonials = "patrimonial-funds"
 
 const controller = controllerMovements;
 
-// await testGetAll();
-await testDelete(10);
+let response = await testGetAll();
+console.log( response.list[response.list.length-1] )
+
+// await testDelete(10);
 /*
     const currentDate = new Date();
     // console.log(currentDate.toISOString());
