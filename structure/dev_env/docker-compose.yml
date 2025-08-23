@@ -13,3 +13,8 @@ services:
       - "5432:5432"
     volumes:
       - C:/Users/alexb/me/personal_info/finance/structure/dev_env/volume/database:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U alepf -d personal_finance_db" ]
+      interval: 3s
+      timeout: 3s
+      retries: 5
