@@ -61,7 +61,7 @@ export default function TransferForm({ patrimonialFunds, transfer, onSave, onCan
                                 id="amount"
                                 type="number"
                                 step="0.01"
-                                value={formData.amount || ''}
+                                value={ formData.amount >= 0 ? formData.amount : '' }
                                 onChange={(e) => handleChange('amount', parseFloat(e.target.value))}
                                 required
                             />

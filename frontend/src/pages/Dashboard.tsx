@@ -8,6 +8,8 @@ import EconomicAccountDto from "@/dto/finance/report/EconomicResultDto.ts";
 import CurrencyEur from "@/lib/CurrencyEur.ts";
 import type PatrimonialResultDto from "@/dto/finance/report/PatrimonialResultDto.ts";
 import DateUtils from "@/lib/DateUtils.ts";
+import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table.tsx";
+import {format} from "date-fns";
 
 export default function Dashboard() {
 
@@ -243,16 +245,34 @@ export default function Dashboard() {
                             <div className="font-bold my-4 flex justify-end">
                                 Totale: {CurrencyEur.getInstance().format(patrimonialResult.totalAmount)}
                             </div>
-                            <div className="space-y-2">
-                                {[...patrimonialResult.listItems]
-                                    .sort((a, b) => b.amount - a.amount)
-                                    .map((item, idx) => (
-                                        <div key={idx} className="flex justify-between border-b pb-1">
-                                            <span>{item.patrimonialFund?.label}</span>
-                                            <span>{CurrencyEur.getInstance().format(item.amount)}</span>
-                                        </div>
-                                    ))}
-                            </div>
+
+                            <Table className="space-y-2">
+                                <TableHeader className="hidden">
+                                    <TableRow>
+                                        <TableHead>Fondo</TableHead>
+                                        <TableHead className="text-right">Importo</TableHead>
+                                    </TableRow>
+                                </TableHeader>
+                                <TableBody>
+                                    {[...patrimonialResult.listItems].length === 0 ? (
+                                        <TableRow>
+                                            <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
+                                                Nessun movimento trovato per questo fondo
+                                            </TableCell>
+                                        </TableRow>
+                                    ) : (
+                                        [...patrimonialResult.listItems]
+                                            .sort((a, b) => b.amount - a.amount)
+                                            .map((item, idx) => (
+                                                <TableRow key={idx}>
+                                                    <TableCell>{item.patrimonialFund?.label}</TableCell>
+                                                    <TableCell className="text-right">{CurrencyEur.getInstance().format(item.amount)}</TableCell>
+                                                </TableRow>
+                                            ))
+                                    )}
+                                </TableBody>
+                            </Table>
+
                         </div>
                     )}
                 </CardContent>
