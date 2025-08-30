@@ -12,7 +12,7 @@ public interface TransferMovementJpaRepo extends JpaRepository<TransferMovementE
 
     @Query("SELECT m FROM TransferMovementEntityView m " +
             " WHERE m.dt <= :dtTo " +
-            " ORDER BY m.dt DESC")
+            " ORDER BY m.dt DESC, m.createdAt DESC ")
     List<TransferMovementEntityView> listLatestTransfersByDtLessThanEqual(LocalDateTime dtTo, Pageable pageable);
 
 }

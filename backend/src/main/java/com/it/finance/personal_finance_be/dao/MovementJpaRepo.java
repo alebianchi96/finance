@@ -25,7 +25,7 @@ public interface MovementJpaRepo extends PfRepository<MovementEntity> {
             " WHERE m.patrimonialFund.id = :idPatrimonialFund " +
             " AND m.dt <= :dtTo " +
             " AND m.economicAccount IS NOT NULL " +
-            " ORDER BY m.dt DESC")
+            " ORDER BY m.dt DESC, m.createdAt DESC ")
     List<MovementEntity> listLatestEconomicsByPatrimonialFundAndDtLessThanEqual(Long idPatrimonialFund, LocalDateTime dtTo, Pageable pageable);
 
     List<MovementEntity> findAllByBlockId(Long blockId);
