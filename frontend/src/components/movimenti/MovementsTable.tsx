@@ -36,8 +36,9 @@ export default function MovementsTable({ movements, onEdit, onDelete }: Movement
                     ) : (
                         movements.map((movement) => (
                             <TableRow key={movement.id}>
-                                <TableCell>
+                                <TableCell className={ DateUtils.isFuture( movement.dt ) }>
                                     {DateUtils.formatDateByTemplate( movement.dt, 'DD/MM/YYYY' )}
+                                    { DateUtils.isFuture( movement.dt ) ? ' Futura?' : '' }
                                 </TableCell>
                                 <TableCell>
                                     {movement.economicAccount?.economicCategory?.label + " - " + movement.economicAccount?.label}

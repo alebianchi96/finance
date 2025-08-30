@@ -79,13 +79,45 @@ export default class DateUtils {
     }
 
     static currentYearAsString() : string {
-        return moment()
+        return DateUtils.getUnitAsStringFromCurrentDate( "YYYY" );
+    }
+
+    static getUnitAsStringFromCurrentDate( timeUnit:string ) : string {
+        return DateUtils.getUnitAsStringFromDate( moment().toDate(), timeUnit )
+    }
+
+    static getUnitAsStringFromDate( dt:Date, timeUnit:string ) : string {
+        return moment(dt)
             .tz(DateUtils.getLocaleTz())
-            .format("YYYY");
+            .format(timeUnit);
     }
 
     static createBlockId() :number {
         return DateUtils.currentDate().getTime();
+    }
+
+
+    static /* className={ DateUtils.isFuture( transfer.dt ) } */ isFuture( d:Date ):string {
+
+        if(!d) { return ""; }
+
+        // current date
+        let currYear : number = Number.parseInt( DateUtils.getUnitAsStringFromCurrentDate( "YYYY" ) );
+        let currMonth : number = Number.parseInt( DateUtils.getUnitAsStringFromCurrentDate( "MM" ) );
+        let currDay : number = Number.parseInt( DateUtils.getUnitAsStringFromCurrentDate( "DD" ) );
+
+        let givenYear : number = Number.parseInt( DateUtils.getUnitAsStringFromDate( d, "YYYY" ) );
+        let givenMonth : number = Number.parseInt( DateUtils.getUnitAsStringFromDate( d, "MM" ) );
+        let givenDay : number = Number.parseInt( DateUtils.getUnitAsStringFromDate( d, "DD" ) );
+
+        let isFuture : boolean = givenYear > currYear
+            || ( givenYear === currYear && givenMonth > currMonth )
+            || ( givenYear === currYear && givenMonth === currMonth && givenDay > currDay );
+
+        if( isFuture ) {
+            return "text-red-500 font-bold";
+        }
+        return "";
     }
 
 }

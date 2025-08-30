@@ -13,6 +13,7 @@ import com.it.finance.personal_finance_be.entity.MovementEntity;
 import com.it.finance.personal_finance_be.entity.PatrimonialFundEntity;
 import com.it.finance.personal_finance_be.entity.TransferMovementEntityView;
 import com.it.finance.personal_finance_be.framework.*;
+import com.it.finance.personal_finance_be.framework.utilities.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;
 import org.springframework.http.ResponseEntity;
@@ -106,7 +107,8 @@ public class MovementService extends PfService<MovementEntity, MovementDto> {
             throw new PfUnexpectedException(400, "01", "Valore di ricerca nullo per fondo patrimoniale");
         }
 
-        LocalDateTime dtTo = movDtoRequest.getDt() != null ? movDtoRequest.getDt() : LocalDateTime.now();
+        LocalDateTime dtTo = movDtoRequest.getDt() != null ?
+                movDtoRequest.getDt() : DateUtils.max();
         dtTo = dtTo.with(LocalTime.MAX);
 
         Pageable pageable = PageRequest.of(0, 20);
@@ -132,7 +134,8 @@ public class MovementService extends PfService<MovementEntity, MovementDto> {
 
         // prendo gli ultimi 20 in un modo o nell'altro per il dato idPatrimonialFund e precenti o uguali da data fornita
         TransferMovementDto movDtoRequest = searchRequest.getDto();
-        LocalDateTime dtTo = movDtoRequest.getDt() != null ? movDtoRequest.getDt() : LocalDateTime.now();
+        LocalDateTime dtTo = movDtoRequest.getDt() != null ?
+                    movDtoRequest.getDt() : DateUtils.max();
         dtTo = dtTo.with(LocalTime.MAX);
 
         Pageable pageable = PageRequest.of(0, 20);

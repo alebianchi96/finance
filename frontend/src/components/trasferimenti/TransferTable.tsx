@@ -35,8 +35,9 @@ export default function TransferTable({ transfers, onEdit, onDelete }: TransferT
                 ) : (
                     transfers.map(transfer => (
                         <TableRow key={transfer.id}>
-                            <TableCell>
+                            <TableCell className={ DateUtils.isFuture( transfer.dt ) }>
                                 {DateUtils.formatDateByTemplate( transfer.dt, 'DD/MM/YYYY')}
+                                { DateUtils.isFuture( transfer.dt ) ? ' Futura?' : '' }
                             </TableCell>
                             <TableCell>{transfer.patrimonialFundFrom?.label}</TableCell>
                             <TableCell>{transfer.patrimonialFundTo?.label}</TableCell>
