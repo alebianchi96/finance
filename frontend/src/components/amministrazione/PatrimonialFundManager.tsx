@@ -7,13 +7,12 @@ import {Input} from "@/components/ui/input";
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table";
 import PatrimonialFundDto from "@/dto/finance/PatrimonialFundDto";
 import PatrimonialFundService from "@/service/PatrimonialFundService.ts";
-import {Filter, Edit, Trash} from "lucide-react";
+import {Edit, Filter, Trash} from "lucide-react";
 import type PatrimonialFundInitDto from "@/dto/finance/PatrimonialFundInitDto.ts";
 import CurrencyEur from "@/lib/CurrencyEur.ts";
 import MovementDto from "@/dto/finance/MovementDto.ts";
 import {Label} from "@/components/ui/label.tsx";
 import DateUtils from "@/lib/DateUtils.ts";
-import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select.tsx";
 import MovementService from "@/service/MovementService.ts";
 import Constants from "@/constants/Constants.ts";
 
@@ -98,10 +97,10 @@ export default function PatrimonialFundManager() {
     const buildInitMovement = (fund: PatrimonialFundInitDto): MovementDto => {
         let mvn = new MovementDto();
         mvn.patrimonialFund = convertToFundDto(fund);
-        mvn.dt = new Date();
+        mvn.dt = DateUtils.currentDate();
+        mvn.blockId = DateUtils.createBlockId();
         mvn.note = Constants.INIT_NOTE
         mvn.amount=0;
-        mvn.blockId = new Date().getTime();
         return mvn;
     }
 
@@ -297,7 +296,10 @@ export default function PatrimonialFundManager() {
                                     id="date"
                                     type="date"
                                     value={currentFundInitMovement?.dt ? DateUtils.formatDate(currentFundInitMovement.dt) : ''}
-                                    onChange={(e) => handleChangeInFundInitMovement('dt', new Date(e.target.value))}
+                                    onChange={(e) => handleChangeInFundInitMovement(
+                                        'dt',
+                                        new Date(e.target.value))
+                                    }
                                     required
                                 />
                             </div>

@@ -1,8 +1,8 @@
 // src/pages/Movimenti.tsx
-import { useState, useEffect } from "react";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Button } from "@/components/ui/button";
+import {useEffect, useState} from "react";
+import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
+import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
+import {Button} from "@/components/ui/button";
 import MovementsTable from "@/components/movimenti/MovementsTable.tsx";
 import MovementForm from "@/components/movimenti/MovementForm";
 import PatrimonialFundDto from "@/dto/finance/PatrimonialFundDto";
@@ -10,6 +10,7 @@ import MovementDto from "@/dto/finance/MovementDto";
 import PatrimonialFundService from "@/service/PatrimonialFundService.ts";
 import MovementService from "@/service/MovementService.ts";
 import CurrencyEur from "@/lib/CurrencyEur.ts";
+import DateUtils from "@/lib/DateUtils.ts";
 
 export default function Movimenti() {
 
@@ -35,7 +36,7 @@ export default function Movimenti() {
     useEffect(() => {
         if (!selectedFundId) return;
         movementService.loadEconomicMovementsByPatrimonialFund(selectedFundId, setMovements);
-        patrimonialFundService.fundAmountByIdAtDate(selectedFundId, new Date(), setSelectedFundAmount);
+        patrimonialFundService.fundAmountByIdAtDate(selectedFundId, DateUtils.currentDate(), setSelectedFundAmount);
     }, [selectedFundId]);
 
     // @type IN C | R
@@ -50,9 +51,9 @@ export default function Movimenti() {
         newMovement.patrimonialFund = fund;
 
         // la data e' la massima presente in movements altrimenti la data attuale
-        newMovement.dt = movements.reduce((max, m) => m.dt && m.dt > max ? m.dt : max, new Date());
+        newMovement.dt = movements.reduce((max, m) => m.dt && m.dt > max ? m.dt : max, DateUtils.currentDate());
 
-        newMovement.blockId = new Date().getTime();
+        newMovement.blockId = DateUtils.createBlockId();
 
         setSelectedNature(type)
         setCurrentMovement(newMovement);
@@ -68,7 +69,7 @@ export default function Movimenti() {
     const deleteMovement = async (id: number) => {
         await movementService.delete(id);
         movementService.loadEconomicMovementsByPatrimonialFund(selectedFundId, setMovements);
-        patrimonialFundService.fundAmountByIdAtDate(selectedFundId, new Date(), setSelectedFundAmount);
+        patrimonialFundService.fundAmountByIdAtDate(selectedFundId, DateUtils.currentDate(), setSelectedFundAmount);
     };
 
     const saveMovement = async (movement: MovementDto) => {
@@ -91,7 +92,7 @@ export default function Movimenti() {
         }
         setIsFormOpen(false);
         await movementService.loadEconomicMovementsByPatrimonialFund(selectedFundId, setMovements);
-        patrimonialFundService.fundAmountByIdAtDate(selectedFundId, new Date(), setSelectedFundAmount);
+        patrimonialFundService.fundAmountByIdAtDate(selectedFundId, DateUtils.currentDate(), setSelectedFundAmount);
     };
 
     return (

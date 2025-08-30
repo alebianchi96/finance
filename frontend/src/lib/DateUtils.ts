@@ -1,50 +1,91 @@
+import moment from 'moment-timezone'
+import RangeDateDto from "@/dto/utils/RangeDateDto.ts";
+
 export default class DateUtils {
 
-    static formatDate(d:Date):string|undefined {
+    // private static TIMEZONE_ROME : string = 'Europe/Rome';
+
+    private static getLocaleTz() : string {
+        return Intl.DateTimeFormat().resolvedOptions().timeZone;
+    }
+
+    static formatDateByTemplate(d:Date, template:string):string|undefined {
         if(!d) { return undefined; }
+        return moment( d )
+            .tz(DateUtils.getLocaleTz())
+            // .format("YYYY-MM-DD HH:mm:ss.SSS");
+            .format(template);
+    }
 
-        let y :string = "";
-        let m :string = "";
-        let day :string = "";
-
-        if(typeof d === 'string') {
-            let dtArr = d.split("T")[0];
-            y = dtArr.split("-")[0];
-            m = dtArr.split("-")[1];
-            day = dtArr.split("-")[2];
-        } else {
-            y = d.getFullYear();
-            m = (d.getMonth()+1).toString().padStart(2, "0");
-            day = d.getUTCDate().toString().padStart(2, "0");
-        }
-
-        let formattedDate = `${y}-${m}-${day}`
-        // console.log(formattedDate);
-        return formattedDate;
+    static formatDate(d:Date):string|undefined {
+        return DateUtils.formatDateByTemplate(d, "YYYY-MM-DD");
     }
 
     static getMonthName(d:Date): string {
         if(!d) { return ""; }
+
+        const currentMonthAsString = moment( d )
+            .tz(DateUtils.getLocaleTz())
+            .format("MM");
+
+        const currentMonthIndex = Number.parseInt(currentMonthAsString) - 1;
 
         const monthNames = [
             "Gennaio", "Febbraio", "Marzo", "Aprile", "Maggio", "Giugno",
             "Luglio", "Agosto", "Settembre", "Ottobre", "Novembre", "Dicembre"
         ];
 
-        return monthNames[d.getMonth()];
+        return monthNames[currentMonthIndex];
     }
 
     static parse(yyyyMMdd: string|undefined): Date|undefined {
+
         if(!yyyyMMdd) { return undefined; }
+
         if(yyyyMMdd.indexOf("-") === -1) {
             return undefined;
         }
-        let arr = yyyyMMdd.split("-");
-        return new Date(
-            parseInt(arr[0]),
-            parseInt(arr[1]) - 1, // Mese in JavaScript è zero-based
-            parseInt(arr[2]) // Giorno
-        );
+
+        return moment(yyyyMMdd, "YYYY-MM-DD").toDate()
+    }
+
+    /* Date ranges */
+    static currentMonthRange() : RangeDateDto {
+        const now   = DateUtils.currentDate();
+        const from  = new Date(now.getFullYear(), now.getMonth(), 1);
+        const to    = new Date(now.getFullYear(), now.getMonth()+1, 0);
+        return new RangeDateDto(from, to);
+    }
+
+    static currentYearRange() : RangeDateDto {
+        const now   = DateUtils.currentDate();
+        const from  = new Date(now.getFullYear(), 0, 1);
+        const to    = new Date(now.getFullYear()+1, 0, 0);
+        return new RangeDateDto(from, to);
+    }
+
+    static currentDate() : Date {
+        return new Date();
+    }
+
+    static startOfMonthDate() : Date {
+        let startMonth = DateUtils.currentDate();
+        startMonth.setDate(1);
+        return startMonth;
+    }
+
+    static startOfYearDate() : Date {
+        return new Date(DateUtils.currentDate().getFullYear(), 0, 0)
+    }
+
+    static currentYearAsString() : string {
+        return moment()
+            .tz(DateUtils.getLocaleTz())
+            .format("YYYY");
+    }
+
+    static createBlockId() :number {
+        return DateUtils.currentDate().getTime();
     }
 
 }

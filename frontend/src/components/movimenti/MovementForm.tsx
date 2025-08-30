@@ -1,10 +1,10 @@
 // src/components/movimenti/MovementForm.tsx
-import { useEffect, useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {useEffect, useState} from "react";
+import {Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle} from "@/components/ui/dialog";
+import {Button} from "@/components/ui/button";
+import {Input} from "@/components/ui/input";
+import {Label} from "@/components/ui/label";
+import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
 import MovementDto from "@/dto/finance/MovementDto";
 import EconomicAccountDto from "@/dto/finance/EconomicAccountDto";
 import type EconomicCategoryDto from "@/dto/finance/EconomicCategoryDto.ts";
@@ -80,7 +80,10 @@ export default function MovementForm({ movement, onSave, onCancel, isOpen, setIs
                                 id="date"
                                 type="date"
                                 value={formData.dt ? DateUtils.formatDate(formData.dt) : ''}
-                                onChange={(e) => handleChange('dt', new Date(e.target.value))}
+                                onChange={(e) => handleChange(
+                                    'dt',
+                                    new Date(e.target.value))
+                                }
                                 required
                             />
                         </div>

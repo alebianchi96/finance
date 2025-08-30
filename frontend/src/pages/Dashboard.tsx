@@ -1,15 +1,14 @@
 // src/pages/Dashboard.tsx
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { useNavigate } from "react-router-dom";
-import React, { useState } from "react";
+import {Card, CardContent, CardDescription, CardHeader, CardTitle} from "@/components/ui/card";
+import {Button} from "@/components/ui/button";
+import {useNavigate} from "react-router-dom";
+import React, {useState} from "react";
 import ReportService from "@/service/ReportService.ts";
 import EconomicAccountDto from "@/dto/finance/report/EconomicResultDto.ts";
 import CurrencyEur from "@/lib/CurrencyEur.ts";
 import type PatrimonialResultDto from "@/dto/finance/report/PatrimonialResultDto.ts";
 import DateUtils from "@/lib/DateUtils.ts";
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table.tsx";
-import {format} from "date-fns";
 
 export default function Dashboard() {
 
@@ -37,30 +36,30 @@ export default function Dashboard() {
     const [patrimonialResult, setPatrimonialResult] = useState<PatrimonialResultDto | null>(null);
 
     const retrieveCurrentMonthEconomicResult = async () => {
-        const now = new Date();
-        const from = new Date(now.getFullYear(), now.getMonth(), 1);
-        const to = new Date(now.getFullYear(), now.getMonth()+1, 0);
+        const { from, to } = DateUtils.currentMonthRange();
         const response = await reportService.getEconomicResult(from, to);
         setCurrentMonthEconomicResult(response?.dto);
     }
 
     const retrieveCurrentYearEconomicResult = async () => {
-        const now = new Date();
-        const from = new Date(now.getFullYear(), 0, 1);
-        const to = new Date(now.getFullYear()+1, 0, 0);
+        const { from, to } = DateUtils.currentYearRange();
         const response = await reportService.getEconomicResult(from, to);
         setCurrentYearEconomicResult(response?.dto);
     }
 
     const retrieveCurrentPatrimonialResult = async () => {
-        const ref = new Date();
-        const response = await reportService.getPatrimonialResult(ref);
+        const response = await reportService
+            .getPatrimonialResult(
+                DateUtils.currentDate()
+            );
         setCurrentPatrimonialResult(response?.dto);
     }
 
     const retrieveYearStartPatrimonialResult = async () => {
-        const ref = new Date(new Date().getFullYear(), 0, 0);
-        const response = await reportService.getPatrimonialResult(ref);
+        const response = await reportService
+            .getPatrimonialResult(
+                DateUtils.startOfYearDate()
+            );
         setYearStartPatrimonialResult(response?.dto);
     }
 
@@ -78,23 +77,11 @@ export default function Dashboard() {
     const [economicTo, setEconomicTo] = useState();
     const [patrimonialDate, setPatrimonialDate] = useState();
 
-    const getStartOfMonthDate = ()=>{
-        let startMonth = new Date();
-        startMonth.setDate(1);
-        return startMonth;
-    }
 
     const retrieveEconomicResult = async () => {
 
-        // console.log("> economic_state: ", { economicFrom, economicTo });
-
-        let startMonth = getStartOfMonthDate();
-        let now = new Date();
-
-        const from = DateUtils.parse(economicFrom) ?? startMonth;
-        const to = DateUtils.parse(economicTo) ?? now;
-
-        // console.log("> economic_date: ", { from, to });
+        const from = DateUtils.parse(economicFrom) ?? DateUtils.startOfMonthDate();
+        const to = DateUtils.parse(economicTo) ?? DateUtils.currentDate();
 
         const response = await reportService.getEconomicResult(from, to);
         setEconomicResult(response?.dto);
@@ -104,7 +91,7 @@ export default function Dashboard() {
 
         // console.log("> patrimonial_state: ", {patrimonialDate});
 
-        const ref = DateUtils.parse(patrimonialDate) ?? new Date();
+        const ref = DateUtils.parse(patrimonialDate) ?? DateUtils.currentDate();
 
         // console.log("> patrimonial_filter: ", {ref})
 
@@ -164,20 +151,20 @@ export default function Dashboard() {
     return (
         <div className="space-y-8 w-full bg-background text-foreground">
             <div className="text-center">
-                <h1 className="text-4xl font-bold mb-2">Benvenuto nella tua App di Finanza Personale</h1>
-                <p className="text-muted-foreground">Gestisci i tuoi fondi, movimenti e categorie economiche</p>
+                <h1 className="text-4xl font-bold mb-2">Benvenuto in Personal Finance</h1>
+                <p className="text-muted-foreground">Gestisci le tue finanze con semplicità!</p>
             </div>
 
             <div className="w-full flex justify-between gap-4">
 
                 <div className="w-full grid grid-cols-1 gap-4">
-                    <CardAmount styled={true} title="Risultato mese corrente:" description={DateUtils.getMonthName(new Date()) + " " + new Date().getFullYear().toString()} amount={currentMonthEconomicResult?.totalResult ?? 0} />
-                    <CardAmount styled={true} title="Risultato anno corrente:" description={new Date().getFullYear().toString()} amount={currentYearEconomicResult?.totalResult ?? 0} />
+                    <CardAmount styled={true} title="Risultato mese corrente:" description={DateUtils.getMonthName(DateUtils.currentDate()) + " " + DateUtils.currentYearAsString()} amount={currentMonthEconomicResult?.totalResult ?? 0} />
+                    <CardAmount styled={true} title="Risultato anno corrente:" description={DateUtils.currentYearAsString()} amount={currentYearEconomicResult?.totalResult ?? 0} />
                 </div>
 
                 <div className="w-full grid grid-cols-1 gap-4">
-                    <CardAmount styled={false} title="Patrimonio corrente:" description={DateUtils.formatDate(new Date())} amount={currentPatrimonialResult?.totalAmount ?? 0} />
-                    <CardAmount styled={false} title="Patrimonio inzio anno:" description={new Date().getFullYear().toString()} amount={yearStartPatrimonialResult?.totalAmount ?? 0} />
+                    <CardAmount styled={false} title="Patrimonio corrente:" description={DateUtils.formatDate(DateUtils.currentDate())} amount={currentPatrimonialResult?.totalAmount ?? 0} />
+                    <CardAmount styled={false} title="Patrimonio inzio anno:" description={DateUtils.currentYearAsString()} amount={yearStartPatrimonialResult?.totalAmount ?? 0} />
                 </div>
 
             </div>
@@ -194,7 +181,7 @@ export default function Dashboard() {
                             <label>Da: </label>
                             <input
                                 type="date"
-                                value={economicFrom ?? DateUtils.formatDate(getStartOfMonthDate())}
+                                value={economicFrom ?? DateUtils.formatDate(DateUtils.startOfMonthDate())}
                                 onChange={e => setDateState(e.target.value, setEconomicFrom)}
                                 className="border rounded px-2 py-1"
                             />
@@ -203,7 +190,7 @@ export default function Dashboard() {
                             <label>A: </label>
                             <input
                                 type="date"
-                                value={economicTo ?? DateUtils.formatDate(new Date())}
+                                value={economicTo ?? DateUtils.formatDate(DateUtils.currentDate())}
                                 onChange={e => setDateState(e.target.value, setEconomicTo)}
                                 className="border rounded px-2 py-1"
                             />
@@ -233,7 +220,7 @@ export default function Dashboard() {
                             <label>Data: </label>
                             <input
                                 type="date"
-                                value={patrimonialDate ?? DateUtils.formatDate(new Date())}
+                                value={patrimonialDate ?? DateUtils.formatDate(DateUtils.currentDate())}
                                 onChange={e => setDateState(e.target.value, setPatrimonialDate)}
                                 className="border rounded px-2 py-1"
                             />

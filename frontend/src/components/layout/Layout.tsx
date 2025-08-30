@@ -10,6 +10,7 @@ import {
     Moon
 } from "lucide-react";
 import React from "react";
+import DateUtils from "@/lib/DateUtils.ts";
 
 export default function Layout() {
     const location = useLocation();
@@ -80,7 +81,7 @@ export default function Layout() {
                         <path d="M12 17C12.55 17 13 16.55 13 16C13 15.45 12.55 15 12 15C11.45 15 11 15.45 11 16C11 16.55 11.45 17 12 17Z" fill="currentColor"/>
                         <path d="M12 7C10.9 7 10 7.9 10 9H12C12 8.45 12.45 8 13 8C13.55 8 14 8.45 14 9C14 9.55 13.55 10 13 10H12V13H14V11.23C15.25 10.84 16 9.69 16 8.5C16 7.12 14.88 6 13.5 6C13.33 6 13.17 6.02 13 6.05C12.75 6.03 12.38 7 12 7Z" fill="currentColor"/>
                     </svg>
-                    <span>&copy; {new Date().getFullYear()} Personal Finance App</span>
+                    <span>&copy; {DateUtils.currentYearAsString()} Personal Finance App</span>
                 </div>
             </footer>
         </div>

@@ -1,3 +1,5 @@
+import moment from 'moment-timezone';
+
 
 const baseUrl = 'http://localhost:8281';
 
@@ -8,12 +10,13 @@ const controllerPatrimonials = "patrimonial-funds"
 
 const controller = controllerMovements;
 
-let response = await testGetAll();
-console.log( response.list[response.list.length-1] )
+// let response = await testGetAll();
+// console.log( response.list[response.list.length-1] )
 
 // await testDelete(10);
-/*
     const currentDate = new Date();
+
+
     // console.log(currentDate.toISOString());
     let testMovement = {
         dt:currentDate.toISOString(),
@@ -23,9 +26,8 @@ console.log( response.list[response.list.length-1] )
         amount:100.00,
         blockId:new Date().getTime()
     }
-    let response = await testInsert(testMovement);
-    console.log( response )
-*/
+    // let response = await testInsert(testMovement);
+    console.log( testMovement )
 
 // await testGetAll();
 // await testGetId(14);

@@ -1,10 +1,9 @@
 // src/components/trasferimenti/TransferTable.tsx
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
-import { format } from "date-fns";
-import MovementDto from "@/dto/finance/MovementDto";
+import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table";
+import {Button} from "@/components/ui/button";
 import CurrencyEur from "@/lib/CurrencyEur.ts";
 import type TransferMovementDto from "@/dto/finance/TransferMovementDto.ts";
+import DateUtils from "@/lib/DateUtils.ts";
 
 interface TransferTableProps {
     transfers: TransferMovementDto[];
@@ -36,7 +35,9 @@ export default function TransferTable({ transfers, onEdit, onDelete }: TransferT
                 ) : (
                     transfers.map(transfer => (
                         <TableRow key={transfer.id}>
-                            <TableCell>{format(new Date(transfer.dt), 'dd/MM/yyyy')}</TableCell>
+                            <TableCell>
+                                {DateUtils.formatDateByTemplate( transfer.dt, 'DD/MM/YYYY')}
+                            </TableCell>
                             <TableCell>{transfer.patrimonialFundFrom?.label}</TableCell>
                             <TableCell>{transfer.patrimonialFundTo?.label}</TableCell>
                             <TableCell className="text-right">{

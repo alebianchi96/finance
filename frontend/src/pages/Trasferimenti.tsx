@@ -4,11 +4,11 @@ import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
 import {Button} from "@/components/ui/button";
 import TransferForm from "@/components/trasferimenti/TransferForm";
 import TransferTable from "@/components/trasferimenti/TransferTable";
-import MovementDto from "@/dto/finance/MovementDto";
 import PatrimonialFundDto from "@/dto/finance/PatrimonialFundDto.ts";
 import TransferMovementDto from "@/dto/finance/TransferMovementDto.ts";
 import PatrimonialFundService from "@/service/PatrimonialFundService.ts";
 import MovementService from "@/service/MovementService.ts";
+import DateUtils from "@/lib/DateUtils.ts";
 
 export default function Trasferimenti() {
 
@@ -29,7 +29,9 @@ export default function Trasferimenti() {
 
     const handleAddTransfer = () => {
         let newTransfer = new TransferMovementDto();
-        newTransfer.dt = transfers.reduce((max, m) => m.dt && m.dt > max ? m.dt : max, new Date());
+        newTransfer.dt = transfers.reduce(
+            (max, m) => m.dt && m.dt > max ? m.dt : max, DateUtils.currentDate()
+        );
         setCurrentTransfer(newTransfer);
         setIsFormOpen(true);
     };

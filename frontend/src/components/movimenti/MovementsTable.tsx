@@ -1,10 +1,10 @@
 // src/components/movimenti/MovementsTable.tsx
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { format } from "date-fns";
+import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table";
+import {Button} from "@/components/ui/button";
+import {Card} from "@/components/ui/card";
 import MovementDto from "@/dto/finance/MovementDto";
 import CurrencyEur from "@/lib/CurrencyEur.ts";
+import DateUtils from "@/lib/DateUtils.ts";
 
 interface MovementsTableProps {
     movements: MovementDto[];
@@ -36,7 +36,9 @@ export default function MovementsTable({ movements, onEdit, onDelete }: Movement
                     ) : (
                         movements.map((movement) => (
                             <TableRow key={movement.id}>
-                                <TableCell>{format(new Date(movement.dt), 'dd/MM/yyyy')}</TableCell>
+                                <TableCell>
+                                    {DateUtils.formatDateByTemplate( movement.dt, 'DD/MM/YYYY' )}
+                                </TableCell>
                                 <TableCell>
                                     {movement.economicAccount?.economicCategory?.label + " - " + movement.economicAccount?.label}
                                 </TableCell>
