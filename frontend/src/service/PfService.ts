@@ -4,14 +4,22 @@ import type SearchRequestDto from "@/dto/framework/SearchRequestDto.ts";
 import type PfDto from "@/dto/framework/PfDto.ts";
 import type SearchResponseDto from "@/dto/framework/SearchResponseDto.ts";
 import CustomAlert from "@/components/custom/CustomAlert.ts";
-import * as process from "node:process";
 
 export default abstract class PfService<DTO extends PfDto> {
 
     protected getBackendUrl() {
-        let port = "8281";
-        let bu = `http://localhost:${port}`
+
+        // situazione di sviluppo:
+        let isDev = window.location.href
+            .indexOf("http://localhost:") === 0
+
+        let bu = ''
+        if(isDev) {
+            let port = "8281";
+            return `http://localhost:${port}`
+        }
         return bu;
+
     }
 
     abstract getDomain() : string;
@@ -34,8 +42,6 @@ export default abstract class PfService<DTO extends PfDto> {
 
     protected async manageError(err:any):Promise<null> {
         console.error(err);
-        // alert('Si è verificato un errore imprevisto durante la richiesta al server. Riprova più tardi.');
-
         CustomAlert.show("Personal Finance", "Si è verificato un errore imprevisto durante la richiesta al server. Riprova più tardi.");
         return null;
     }
