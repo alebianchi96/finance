@@ -3,8 +3,9 @@ import MovementDto from "@/dto/finance/MovementDto.ts";
 import SearchRequestDto from "@/dto/framework/SearchRequestDto.ts";
 import PatrimonialFundDto from "@/dto/finance/PatrimonialFundDto.ts";
 import type PfObjectApiResponse from "@/dto/framework/PfObjectApiResponse.ts";
-import type SearchResponseDto from "@/dto/framework/SearchResponseDto.ts";
 import TransferMovementDto from "@/dto/finance/TransferMovementDto.ts";
+import type PaginationState from "@/dto/finance/pagination/PaginationState.ts";
+import {DEFAULT_PAGE_SIZE} from "@/dto/finance/pagination/PaginationUtils.ts";
 
 export default class MovementService extends PfService<MovementDto> {
 
@@ -21,7 +22,7 @@ export default class MovementService extends PfService<MovementDto> {
         return this.instance;
     }
 
-    async loadEconomicMovementsByPatrimonialFund(idPatrimonialFund: string | undefined, setState: Function) {
+    async loadEconomicMovementsByPatrimonialFund(idPatrimonialFund: string | undefined, setState: Function, paginationState: PaginationState|undefined = undefined) {
         const searchRequest = new SearchRequestDto<MovementDto>();
         searchRequest.dto = new MovementDto();
 
@@ -29,6 +30,14 @@ export default class MovementService extends PfService<MovementDto> {
             searchRequest.dto.patrimonialFund = new PatrimonialFundDto();
             searchRequest.dto.patrimonialFund.id = parseInt(idPatrimonialFund);
         }
+
+        // -------------- setting pagination to search ---------------
+        searchRequest.size=DEFAULT_PAGE_SIZE;
+        if( paginationState?.paginationData?.currentPage ) {
+            searchRequest.page = paginationState.paginationData.currentPage ?? 0;
+            searchRequest.page = searchRequest.page > 0 ? searchRequest.page -1 : 0;
+        }
+        // -----------------------------------------------------------
 
         try {
 
@@ -42,6 +51,18 @@ export default class MovementService extends PfService<MovementDto> {
             });
             let response = await this.readResponse(responseWrapped);
             let lst = response?.dto?.list || [];
+
+            // -------------- setting pagination by search response ---------------
+            if( paginationState?.paginationData?.currentPage || paginationState?.paginationData?.currentPage==0 ) {
+                let page_number = response?.dto?.pageNumber ?? 0;
+                let total_pages = response?.dto?.totalPages ?? 0;
+                paginationState.setPaginationData({
+                    currentPage: page_number,
+                    totalPages: total_pages
+                })
+            }
+            // -------------------------------------------------------------------
+
             setState( lst );
 
         } catch (err:any) {

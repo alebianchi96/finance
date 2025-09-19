@@ -28,6 +28,12 @@ public interface MovementJpaRepo extends PfRepository<MovementEntity> {
             " ORDER BY m.dt DESC, m.createdAt DESC ")
     List<MovementEntity> listLatestEconomicsByPatrimonialFundAndDtLessThanEqual(Long idPatrimonialFund, LocalDateTime dtTo, Pageable pageable);
 
+    @Query("SELECT count(m.id) FROM MovementEntity m " +
+            " WHERE m.patrimonialFund.id = :idPatrimonialFund " +
+            " AND m.dt <= :dtTo " +
+            " AND m.economicAccount IS NOT NULL ")
+    Long countLatestEconomicsByPatrimonialFundAndDtLessThanEqual(Long idPatrimonialFund, LocalDateTime dtTo);
+
     List<MovementEntity> findAllByBlockId(Long blockId);
 
     @Query("SELECT SUM(m.amount) " +

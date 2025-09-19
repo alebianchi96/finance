@@ -11,6 +11,15 @@ import PatrimonialFundService from "@/service/PatrimonialFundService.ts";
 import MovementService from "@/service/MovementService.ts";
 import CurrencyEur from "@/lib/CurrencyEur.ts";
 import DateUtils from "@/lib/DateUtils.ts";
+import type PaginationData from "@/dto/finance/pagination/PaginationData.ts";
+import {
+    DEFAULT_PAGINATION_DATA,
+    DISABLED_BTN_CLASS,
+    isActivePrevButton,
+    isActiveSuccButton
+} from "@/dto/finance/pagination/PaginationUtils.ts";
+import PaginationComponent from "@/components/movimenti/pagination/PaginationComponent.tsx";
+
 
 export default function Movimenti() {
 
@@ -24,6 +33,20 @@ export default function Movimenti() {
     const [isFormOpen, setIsFormOpen] = useState(false);
     const [currentMovement, setCurrentMovement] = useState<MovementDto | null>(null);
 
+    // ------------- pagination state -------------
+        const [paginationData, setPaginationData] = useState<PaginationData>(DEFAULT_PAGINATION_DATA);
+        function addPage() {
+            let currentPage = paginationData?.currentPage ?? 0;
+            setPaginationData((e)=>{ e.currentPage = currentPage+1 });
+            movementService.loadEconomicMovementsByPatrimonialFund(selectedFundId, setMovements, { paginationData, setPaginationData });
+        }
+        function subtractPage() {
+            let currentPage = paginationData?.currentPage ?? 0;
+            setPaginationData((e)=>{ e.currentPage = currentPage-1 });
+            movementService.loadEconomicMovementsByPatrimonialFund(selectedFundId, setMovements, { paginationData, setPaginationData });
+        }
+    // --------------------------------------------
+
     const patrimonialFundService = PatrimonialFundService.getInstance();
     const movementService = MovementService.getInstance();
 
@@ -35,7 +58,7 @@ export default function Movimenti() {
     // Caricamento dei movimenti quando cambia il fondo selezionato
     useEffect(() => {
         if (!selectedFundId) return;
-        movementService.loadEconomicMovementsByPatrimonialFund(selectedFundId, setMovements);
+        movementService.loadEconomicMovementsByPatrimonialFund(selectedFundId, setMovements, { paginationData:DEFAULT_PAGINATION_DATA, setPaginationData });
         patrimonialFundService.fundAmountByIdAtDate(selectedFundId, DateUtils.currentDate(), setSelectedFundAmount);
     }, [selectedFundId]);
 
@@ -68,7 +91,11 @@ export default function Movimenti() {
 
     const deleteMovement = async (id: number) => {
         await movementService.delete(id);
-        movementService.loadEconomicMovementsByPatrimonialFund(selectedFundId, setMovements);
+        let paginationToUse = paginationData;
+        if( movements && movements.length == 1 ) {
+            paginationToUse = DEFAULT_PAGINATION_DATA
+        }
+        movementService.loadEconomicMovementsByPatrimonialFund(selectedFundId, setMovements, { paginationData:paginationToUse, setPaginationData });
         patrimonialFundService.fundAmountByIdAtDate(selectedFundId, DateUtils.currentDate(), setSelectedFundAmount);
     };
 
@@ -91,7 +118,7 @@ export default function Movimenti() {
             await movementService.insert(movement);
         }
         setIsFormOpen(false);
-        await movementService.loadEconomicMovementsByPatrimonialFund(selectedFundId, setMovements);
+        await movementService.loadEconomicMovementsByPatrimonialFund(selectedFundId, setMovements, { paginationData, setPaginationData });
         patrimonialFundService.fundAmountByIdAtDate(selectedFundId, DateUtils.currentDate(), setSelectedFundAmount);
     };
 
@@ -167,6 +194,13 @@ export default function Movimenti() {
                 </CardContent>
             </Card>
 
+            <PaginationComponent
+                movements={movements}
+                paginationData={paginationData}
+                addPage={addPage}
+                subtractPage={subtractPage}
+            />
+
             {selectedFundId && (
                 <MovementsTable
                     movements={movements}
@@ -188,6 +222,14 @@ export default function Movimenti() {
                     nature={selectedNature}
                 />
             )}
+
+            <PaginationComponent
+                movements={movements}
+                paginationData={paginationData}
+                addPage={addPage}
+                subtractPage={subtractPage}
+            />
+
         </div>
     );
 }

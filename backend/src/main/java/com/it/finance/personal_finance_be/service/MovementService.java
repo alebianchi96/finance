@@ -111,17 +111,24 @@ public class MovementService extends PfService<MovementEntity, MovementDto> {
                 movDtoRequest.getDt() : DateUtils.max();
         dtTo = dtTo.with(LocalTime.MAX);
 
-        Pageable pageable = PageRequest.of(0, 20);
+        int sizeInRequest = searchRequest.getSize();
+        int pageNumberRequest = searchRequest.getPage();
+
+        Pageable pageable = PageRequest.of(pageNumberRequest, sizeInRequest);
 
         List<MovementEntity> lst = repository.listLatestEconomicsByPatrimonialFundAndDtLessThanEqual(
                 idPatrimonialFund, dtTo, pageable);
 
+        Long countAllResults = repository.countLatestEconomicsByPatrimonialFundAndDtLessThanEqual(
+                idPatrimonialFund, dtTo);
+
         SearchResponseDto<MovementDto> response = new SearchResponseDto<>();
         response.setList(this.getAdapter().toDto(lst));
-        response.setPageNumber(1);
-        response.setPageSize(20);
-        response.setTotalElements(20);
-        response.setTotalPages(1);
+        response.setPageNumber(pageNumberRequest+1);
+        response.setPageSize(sizeInRequest);
+        response.setTotalElements(countAllResults != null ? countAllResults : 0);
+        int totalPages = Math.ceilDiv( (int) response.getTotalElements(), sizeInRequest);
+        response.setTotalPages(totalPages);
 
         return response;
     }
