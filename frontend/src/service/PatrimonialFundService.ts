@@ -4,6 +4,7 @@ import SearchRequestDto from "@/dto/framework/SearchRequestDto.ts";
 import type SearchResponseDto from "@/dto/framework/SearchResponseDto.ts";
 import type PfObjectApiResponse from "@/dto/framework/PfObjectApiResponse";
 import type PatrimonialFundInitDto from "@/dto/finance/PatrimonialFundInitDto.ts";
+import {filterInitItems} from "@/lib/utils.ts";
 
 export default class PatrimonialFundService extends PfService<PatrimonialFundDto>{
 
@@ -33,6 +34,10 @@ export default class PatrimonialFundService extends PfService<PatrimonialFundDto
 
         let response : PfObjectApiResponse<SearchResponseDto<PatrimonialFundDto>> = await this.search(searchRequest);
         let lst = response?.dto?.list || [];
+
+        // tolgo le categorie, i conti e i fondi d'appoggio usati per l'inizializzazione
+        lst = filterInitItems(lst);
+
         if(lst) {
             lst.sort((a, b) => {
                 return a.code < b.code ? -1 : 1;
@@ -68,10 +73,11 @@ export default class PatrimonialFundService extends PfService<PatrimonialFundDto
         } catch (err:any) {
             return await this.manageError(err);
         }
-
-
-
         let lst = subResponse?.dto?.list || [];
+
+        // tolgo le categorie, i conti e i fondi d'appoggio usati per l'inizializzazione
+        lst = filterInitItems(lst);
+
         if(lst) {
             lst.sort((a, b) => {
                 return a.code < b.code ? -1 : 1;

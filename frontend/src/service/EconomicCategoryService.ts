@@ -3,6 +3,7 @@ import EconomicCategoryDto from "@/dto/finance/EconomicCategoryDto.ts";
 import SearchRequestDto from "@/dto/framework/SearchRequestDto.ts";
 import type PfObjectApiResponse from "@/dto/framework/PfObjectApiResponse.ts";
 import type SearchResponseDto from "@/dto/framework/SearchResponseDto.ts";
+import {filterInitItems} from "@/lib/utils.ts";
 
 export default class EconomicCategoryService extends PfService<EconomicCategoryDto>{
 
@@ -40,6 +41,10 @@ export default class EconomicCategoryService extends PfService<EconomicCategoryD
 
         let response : PfObjectApiResponse<SearchResponseDto<EconomicCategoryDto>> = await this.search(searchRequest);
         let lst = response?.dto?.list || [];
+
+        // tolgo le categorie, i conti e i fondi d'appoggio usati per l'inizializzazione
+        lst = filterInitItems(lst);
+
         if(lst) {
             lst.sort((a, b) => {
 
