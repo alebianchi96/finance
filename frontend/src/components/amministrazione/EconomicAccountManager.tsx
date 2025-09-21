@@ -101,7 +101,7 @@ export default function EconomicAccountManager() {
                                 content={account.economicCategory.nature}
                             />
                             <div>
-                                {account.economicCategory.code}
+                                {account.economicCategory.code + " - " + account.economicCategory.label}
                             </div>
                         </TableCell>
                         <TableCell> </TableCell>
