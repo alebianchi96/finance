@@ -1,20 +1,19 @@
 // src/components/amministrazione/EconomicAccountManager.tsx
-import { useState, useEffect } from "react";
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {useEffect, useState} from "react";
+import {Button} from "@/components/ui/button";
+import {Card} from "@/components/ui/card";
+import {Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle} from "@/components/ui/dialog";
+import {Input} from "@/components/ui/input";
+import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table";
+import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
 import EconomicAccountDto from "@/dto/finance/EconomicAccountDto";
 import EconomicCategoryDto from "@/dto/finance/EconomicCategoryDto";
 import EconomicCategoryService from "@/service/EconomicCategoryService.ts";
 import EconomicAccountService from "@/service/EconomicAccountService.ts";
-import SearchRequestDto from "@/dto/framework/SearchRequestDto.ts";
-import type PfObjectApiResponse from "@/dto/framework/PfObjectApiResponse.ts";
-import type SearchResponseDto from "@/dto/framework/SearchResponseDto.ts";
 import {Filter} from "lucide-react";
-import BulletAndLabelNature from "@/components/common/BulletAndLabelNature.tsx";
+import BulletAndLabelNature from "@/components/common/bullet/BulletAndLabelNature.tsx";
+import CategoryNature from "@/components/common/bullet/CategoryNature.ts";
+import BulletNature from "@/components/common/bullet/BulletNature.tsx";
 
 export default function EconomicAccountManager() {
 
@@ -95,18 +94,12 @@ export default function EconomicAccountManager() {
                 currentIdCategory = account.economicCategory.id;
                 arrayRows.push(
                     <TableRow key={account.economicCategory.id + "-header"} className={'bg-secondary'}>
-                        <TableCell className={'flex items-center gap-2'}>
-                            <div style={{
-                                borderRadius:'50px',
-                                width:'30px',
-                                height:'30px'
-                            }}
-                                 className={
-                                     `text-white font-medium flex items-center justify-center `
-                                     + (account.economicCategory.nature === 'C' ? "bg-red-600" : "bg-green-600")
-                                 }>
-                                {account.economicCategory.nature}
-                            </div>
+                        <TableCell className="flex items-center gap-2">
+                            <BulletNature
+                                nature={CategoryNature.get(account.economicCategory.nature)}
+                                blinking={false}
+                                content={account.economicCategory.nature}
+                            />
                             <div>
                                 {account.economicCategory.code}
                             </div>
@@ -151,7 +144,7 @@ export default function EconomicAccountManager() {
                     setCurrentAccount(new EconomicAccountDto());
                     setOpen(true);
                 }}>
-                    Nuovo Account
+                    Nuovo Conto Economico
                 </Button>
             </div>
 
@@ -170,13 +163,14 @@ export default function EconomicAccountManager() {
                                 <SelectValue placeholder="Qualsiasi natura" />
                             </SelectTrigger>
                             <SelectContent>
-                                <SelectItem value="any">Qualsiasi</SelectItem>
-                                <SelectItem value="C" key="C">
-                                    <BulletAndLabelNature nature="C" />
-                                </SelectItem>
-                                <SelectItem value="R" key="R">
-                                    <BulletAndLabelNature nature="R" />
-                                </SelectItem>
+                                {
+                                    ["any", "C", "R"].map(v => (
+                                        <SelectItem value={v} key={v}>
+                                            {v === "any" ? "Qualsiasi"
+                                                : <BulletAndLabelNature nature={CategoryNature.get(v)} />}
+                                        </SelectItem>
+                                    ))
+                                }
                             </SelectContent>
                         </Select>
                     </div>
@@ -228,7 +222,7 @@ export default function EconomicAccountManager() {
             <Dialog open={open} onOpenChange={setOpen}>
                 <DialogContent>
                     <DialogHeader>
-                        <DialogTitle>{currentAccount?.id ? "Modifica" : "Nuovo"} Account Economico</DialogTitle>
+                        <DialogTitle>{currentAccount?.id ? "Modifica" : "Nuovo"} Conto Economico</DialogTitle>
                     </DialogHeader>
                     {currentAccount && (
                         <div className="space-y-4">
@@ -261,8 +255,8 @@ export default function EconomicAccountManager() {
                                     <SelectContent>
                                         {categories.map(category => (
                                             <SelectItem key={category.id} value={category.id.toString()} className={"flex items-center gap-2"}>
-                                                <div className={`w-4 h-4 rounded-full ${category.nature === 'R' ? 'bg-green-600':'bg-red-600' }`}></div>
-                                                    <span className="font-medium">
+                                                <BulletNature nature={CategoryNature.get(category.nature)} blinking={false} />
+                                                <span className="font-medium">
                                                     {category.code}
                                                 </span>
                                             </SelectItem>

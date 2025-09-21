@@ -15,6 +15,8 @@ import {Label} from "@/components/ui/label.tsx";
 import DateUtils from "@/lib/DateUtils.ts";
 import MovementService from "@/service/MovementService.ts";
 import Constants from "@/constants/Constants.ts";
+import BulletNature from "@/components/common/bullet/BulletNature.tsx";
+import CategoryNature from "@/components/common/bullet/CategoryNature.ts";
 
 export default function PatrimonialFundManager() {
 
@@ -166,6 +168,7 @@ export default function PatrimonialFundManager() {
             <Table>
                 <TableHeader>
                     <TableRow>
+                        <TableHead>Natura</TableHead>
                         <TableHead>Codice</TableHead>
                         <TableHead>Etichetta</TableHead>
                         <TableHead className="text-center">Valore iniziale</TableHead>
@@ -175,21 +178,10 @@ export default function PatrimonialFundManager() {
                 <TableBody>
                     {funds.map(fund => (
                         <TableRow key={fund.id}>
-                            <TableCell className={'flex items-center gap-2'}>
-                                <div style={{
-                                    borderRadius:'50px',
-                                    width:'30px',
-                                    height:'30px'
-                                }}
-                                 className={
-                                     `text-white font-medium flex items-center justify-center bg-blue-600`
-                                 }>
-                                    F
-                                </div>
-                                <div>
-                                    {fund.code}
-                                </div>
+                            <TableCell>
+                                <BulletNature nature={CategoryNature.F} blinking={false} content={"F"} />
                             </TableCell>
+                            <TableCell>{fund.code}</TableCell>
                             <TableCell>{fund.label}</TableCell>
                             <TableCell>
                                 <div className="flex justify-end align-middle gap-2">

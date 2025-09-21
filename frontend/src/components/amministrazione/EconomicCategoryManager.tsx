@@ -1,19 +1,18 @@
 // src/components/amministrazione/EconomicCategoryManager.tsx
 import {useEffect, useState} from "react";
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {Button} from "@/components/ui/button";
+import {Card} from "@/components/ui/card";
+import {Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle} from "@/components/ui/dialog";
+import {Input} from "@/components/ui/input";
+import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table";
+import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
 import EconomicCategoryDto from "@/dto/finance/EconomicCategoryDto";
 import EconomicCategoryService from "@/service/EconomicCategoryService.ts";
-import SearchRequestDto from "@/dto/framework/SearchRequestDto.ts";
-import { Filter } from "lucide-react";
-import { Switch } from "@/components/ui/switch";
-import type PfObjectApiResponse from "@/dto/framework/PfObjectApiResponse.ts";
-import type SearchResponseDto from "@/dto/framework/SearchResponseDto.ts";
-import BulletAndLabelNature from "@/components/common/BulletAndLabelNature.tsx";
+import {Filter} from "lucide-react";
+import {Switch} from "@/components/ui/switch";
+import BulletAndLabelNature from "@/components/common/bullet/BulletAndLabelNature.tsx";
+import CategoryNature from "@/components/common/bullet/CategoryNature.ts";
+import BulletNature from "@/components/common/bullet/BulletNature.tsx";
 
 export default function EconomicCategoryManager() {
 
@@ -100,13 +99,14 @@ export default function EconomicCategoryManager() {
                                 <SelectValue placeholder="Qualsiasi natura" />
                             </SelectTrigger>
                             <SelectContent>
-                                <SelectItem value="any">Qualsiasi</SelectItem>
-                                <SelectItem value="C" key="C">
-                                    <BulletAndLabelNature nature="C" />
-                                </SelectItem>
-                                <SelectItem value="R" key="R">
-                                    <BulletAndLabelNature nature="R" />
-                                </SelectItem>
+                                {
+                                    ["any", "C", "R"].map(v => (
+                                        <SelectItem value={v} key={v}>
+                                            {v === "any" ? "Qualsiasi"
+                                                : <BulletAndLabelNature nature={CategoryNature.get(v)} />}
+                                        </SelectItem>
+                                    ))
+                                }
                             </SelectContent>
                         </Select>
                     </div>
@@ -134,6 +134,7 @@ export default function EconomicCategoryManager() {
             <Table>
                 <TableHeader>
                     <TableRow>
+                        <TableHead>Natura</TableHead>
                         <TableHead>Codice</TableHead>
                         <TableHead>Etichetta</TableHead>
                         <TableHead className="text-center">Azioni</TableHead>
@@ -142,20 +143,15 @@ export default function EconomicCategoryManager() {
                 <TableBody>
                     {categories?.map(category => (
                         <TableRow key={category.id}>
-                            <TableCell className={'flex items-center gap-2'}>
-                                <div style={{
-                                    borderRadius:'50px',
-                                    width:'30px',
-                                    height:'30px'
-                                }}
-                                className={
-                                    `text-white font-medium flex items-center justify-center `
-                                    + (category.nature === 'C' ? "bg-red-600" : "bg-green-600")
-                                }>
-                                    {category.nature}
-                                </div>
+                            <TableCell className="">
+                                <BulletNature
+                                    nature={CategoryNature.get(category.nature)}
+                                    blinking={false}
+                                    content={category.nature} />
+                            </TableCell>
+                            <TableCell className="">
                                 <div>
-                                {category.code}
+                                    {category.code}
                                 </div>
                             </TableCell>
                             <TableCell>{category.label}</TableCell>
@@ -201,12 +197,7 @@ export default function EconomicCategoryManager() {
                             <div className="space-y-2">
                                 <label className="block text-sm font-medium">Natura</label>
                                 <div className="flex items-center justify-between p-4 rounded-lg border">
-                                    <div className="flex items-center gap-2">
-                                        <div className={`w-4 h-4 rounded-full ${currentCategory.nature === 'R' ? 'bg-green-600':'bg-red-600' }`}></div>
-                                        <span className="font-medium">
-                                            {currentCategory.nature === 'R' ? 'RICAVO':'COSTO' }
-                                        </span>
-                                    </div>
+                                    <BulletAndLabelNature nature={CategoryNature.get(currentCategory.nature)} />
                                     <Switch
                                         checked={currentCategory.nature === 'R'}
                                         onCheckedChange={(checked) =>

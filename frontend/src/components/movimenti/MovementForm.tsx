@@ -10,8 +10,9 @@ import EconomicAccountDto from "@/dto/finance/EconomicAccountDto";
 import type EconomicCategoryDto from "@/dto/finance/EconomicCategoryDto.ts";
 import EconomicCategoryService from "@/service/EconomicCategoryService.ts";
 import EconomicAccountService from "@/service/EconomicAccountService.ts";
-import BulletAndLabelNature from "@/components/common/BulletAndLabelNature.tsx";
+import BulletAndLabelNature from "@/components/common/bullet/BulletAndLabelNature.tsx";
 import DateUtils from "@/lib/DateUtils.ts";
+import CategoryNature from "@/components/common/bullet/CategoryNature.ts";
 
 interface MovementFormProps {
     movement: MovementDto;
@@ -68,7 +69,7 @@ export default function MovementForm({ movement, onSave, onCancel, isOpen, setIs
                         <div className="flex ">
                            <span>{movement.id ? "Modifica Movimento" : "Nuovo Movimento"}</span>
                         </div>
-                        <BulletAndLabelNature nature={nature} />
+                        <BulletAndLabelNature nature={CategoryNature.get(nature)} />
                     </DialogTitle>
                 </DialogHeader>
 

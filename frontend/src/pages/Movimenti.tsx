@@ -19,9 +19,13 @@ import {
     isActiveSuccButton
 } from "@/dto/finance/pagination/PaginationUtils.ts";
 import PaginationComponent from "@/components/movimenti/pagination/PaginationComponent.tsx";
+import PatrimonialFundSelector from "@/components/movimenti/PatrimonialFundSelector.tsx";
 
 
 export default function Movimenti() {
+
+    const patrimonialFundService = PatrimonialFundService.getInstance();
+    const movementService = MovementService.getInstance();
 
     const [patrimonialFunds, setPatrimonialFunds] = useState<PatrimonialFundDto[]>([]);
     const [selectedFundId, setSelectedFundId] = useState<string>("");
@@ -35,20 +39,14 @@ export default function Movimenti() {
 
     // ------------- pagination state -------------
         const [paginationData, setPaginationData] = useState<PaginationData>(DEFAULT_PAGINATION_DATA);
-        function addPage() {
+        async function changePage( variationNumber: number ) {
             let currentPage = paginationData?.currentPage ?? 0;
-            setPaginationData((e)=>{ e.currentPage = currentPage+1 });
-            movementService.loadEconomicMovementsByPatrimonialFund(selectedFundId, setMovements, { paginationData, setPaginationData });
+            setPaginationData((e : PaginationData)=>{ e.currentPage = currentPage+variationNumber; return e; });
+            await movementService.loadEconomicMovementsByPatrimonialFund(selectedFundId, setMovements, { paginationData, setPaginationData });
         }
-        function subtractPage() {
-            let currentPage = paginationData?.currentPage ?? 0;
-            setPaginationData((e)=>{ e.currentPage = currentPage-1 });
-            movementService.loadEconomicMovementsByPatrimonialFund(selectedFundId, setMovements, { paginationData, setPaginationData });
-        }
+        async function addPage() { await changePage( 1); }
+        async function subtractPage() { await changePage( -1); }
     // --------------------------------------------
-
-    const patrimonialFundService = PatrimonialFundService.getInstance();
-    const movementService = MovementService.getInstance();
 
     // Caricamento dei fondi patrimoniali
     useEffect(() => {
@@ -89,18 +87,7 @@ export default function Movimenti() {
         setIsFormOpen(true);
     };
 
-    const deleteMovement = async (id: number) => {
-        await movementService.delete(id);
-        let paginationToUse = paginationData;
-        if( movements && movements.length == 1 ) {
-            paginationToUse = DEFAULT_PAGINATION_DATA
-        }
-        movementService.loadEconomicMovementsByPatrimonialFund(selectedFundId, setMovements, { paginationData:paginationToUse, setPaginationData });
-        patrimonialFundService.fundAmountByIdAtDate(selectedFundId, DateUtils.currentDate(), setSelectedFundAmount);
-    };
-
     const saveMovement = async (movement: MovementDto) => {
-
         // che natura ha il movimento
         const nature = movement.economicAccount?.economicCategory?.nature;
         if((nature=== 'C' && movement.amount > 0)
@@ -119,80 +106,30 @@ export default function Movimenti() {
         }
         setIsFormOpen(false);
         await movementService.loadEconomicMovementsByPatrimonialFund(selectedFundId, setMovements, { paginationData, setPaginationData });
-        patrimonialFundService.fundAmountByIdAtDate(selectedFundId, DateUtils.currentDate(), setSelectedFundAmount);
+        await patrimonialFundService.fundAmountByIdAtDate(selectedFundId, DateUtils.currentDate(), setSelectedFundAmount);
+    };
+
+    const deleteMovement = async (id: number) => {
+        await movementService.delete(id);
+        let paginationToUse = paginationData;
+        if( movements && movements.length == 1 ) {
+            paginationToUse = DEFAULT_PAGINATION_DATA
+        }
+        await movementService.loadEconomicMovementsByPatrimonialFund(selectedFundId, setMovements, { paginationData:paginationToUse, setPaginationData });
+        await patrimonialFundService.fundAmountByIdAtDate(selectedFundId, DateUtils.currentDate(), setSelectedFundAmount);
     };
 
     return (
         <div className="space-y-8 w-full bg-background text-foreground">
             <h1 className="text-3xl font-bold">Gestione Movimenti</h1>
 
-            <Card>
-                <CardHeader>
-                    <CardTitle>Seleziona Fondo Patrimoniale</CardTitle>
-                </CardHeader>
-                <CardContent>
-                    <div className="flex gap-4">
-                        <Select
-                            value={selectedFundId}
-                            onValueChange={(value) => setSelectedFundId(value)}
-                        >
-                            <SelectTrigger className="w-full">
-                                <SelectValue placeholder="Seleziona un fondo" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                {patrimonialFunds.map(fund => (
-                                    <SelectItem key={fund.id} value={fund.id.toString()}>
-                                        <div style={{
-                                            borderRadius:'50px',
-                                            width:'30px',
-                                            height:'30px'
-                                        }}
-                                             className={
-                                                 `text-white font-medium flex items-center justify-center bg-blue-600`
-                                             }>
-                                            F
-                                        </div>
-                                        <div>
-                                            {fund.label}
-                                        </div>
-                                    </SelectItem>
-                                ))}
-                            </SelectContent>
-                        </Select>
-
-                        <Button
-                            onClick={()=>handleAddMovement('C')}
-                            disabled={!selectedFundId}
-                        >
-                            <div className="flex items-center gap-2">
-                                <div className={`w-4 text-white font-medium h-4 rounded-full bg-red-600`}></div>
-                                <span className="font-medium">
-                                    Aggiungi Costo
-                                </span>
-                            </div>
-                        </Button>
-                        <Button
-                            onClick={()=>handleAddMovement('R')}
-                            disabled={!selectedFundId}
-                        >
-                            <div className="flex items-center gap-2">
-                                <div className={`w-4 text-white font-medium h-4 rounded-full bg-green-600`}></div>
-                                <span className="font-medium">
-                                    Aggiungi Ricavo
-                                </span>
-                            </div>
-                        </Button>
-
-                    </div>
-                    <div className="mt-4 flex gap-4">
-                        <p>
-                            <strong>
-                                Importo attuale:
-                            </strong> {CurrencyEur.getInstance().format(selectedFundAmount)}
-                        </p>
-                    </div>
-                </CardContent>
-            </Card>
+            <PatrimonialFundSelector
+                patrimonialFunds={patrimonialFunds}
+                selectedFundId={selectedFundId}
+                selectedFundAmount={selectedFundAmount}
+                setSelectedFundId={setSelectedFundId}
+                handleAddMovement={handleAddMovement}
+            />
 
             <PaginationComponent
                 movements={movements}

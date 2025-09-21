@@ -9,6 +9,8 @@ import CurrencyEur from "@/lib/CurrencyEur.ts";
 import type PatrimonialResultDto from "@/dto/finance/report/PatrimonialResultDto.ts";
 import DateUtils from "@/lib/DateUtils.ts";
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table.tsx";
+import BulletNature from "@/components/common/bullet/BulletNature.tsx";
+import CategoryNature from "@/components/common/bullet/CategoryNature.ts";
 
 export default function Dashboard() {
 
@@ -117,25 +119,18 @@ export default function Dashboard() {
      const CardAmount = ({ title, description, amount, styled }
                          : { title: string; description: string; amount: number; styled:boolean|undefined }) => {
 
-        const dotClasses = "w-4 text-white font-medium h-4 rounded-full blinking-dot";
-
-        const RED_DOT = <div className={`${dotClasses} bg-red-600`}></div>
-
-        const GREEN_DOT = <div className={`${dotClasses} bg-green-600`}></div>
-
-        let DTO_OBJ = <></>
-
         let colorClass="";
         if(styled) {
             colorClass = amount >= 0 ? "text-green-600" : "text-red-600";
-            DTO_OBJ = amount >= 0 ? GREEN_DOT : RED_DOT;
         }
 
         return (
             <Card>
                 <CardHeader>
                     <CardTitle className={`flex items-center gap-2`}>
-                        {DTO_OBJ}
+                        <BulletNature
+                            nature={amount >= 0 ? CategoryNature.R : CategoryNature.C}
+                            blinking={true} />
                         {title}
                     </CardTitle>
                     {description && <CardDescription>{description}</CardDescription>}
@@ -265,43 +260,6 @@ export default function Dashboard() {
                 </CardContent>
             </Card>
 
-            <div className="grid md:grid-cols-3 gap-6">
-                <Card className="hover:shadow-lg transition-shadow">
-                    <CardHeader>
-                        <CardTitle>Amministrazione</CardTitle>
-                        <CardDescription>Gestisci categorie, account e fondi patrimoniali</CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                        <Button onClick={() => navigate("/amministrazione")} className="w-full">
-                            Accedi
-                        </Button>
-                    </CardContent>
-                </Card>
-
-                <Card className="hover:shadow-lg transition-shadow">
-                    <CardHeader>
-                        <CardTitle>Movimenti</CardTitle>
-                        <CardDescription>Visualizza e gestisci i movimenti finanziari</CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                        <Button onClick={() => navigate("/movimenti")} className="w-full">
-                            Accedi
-                        </Button>
-                    </CardContent>
-                </Card>
-
-                <Card className="hover:shadow-lg transition-shadow">
-                    <CardHeader>
-                        <CardTitle>Trasferimenti</CardTitle>
-                        <CardDescription>Gestisci trasferimenti tra fondi patrimoniali</CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                        <Button onClick={() => navigate("/trasferimenti")} className="w-full">
-                            Accedi
-                        </Button>
-                    </CardContent>
-                </Card>
-            </div>
         </div>
     );
 }
