@@ -101,11 +101,6 @@ export default function Dashboard() {
         setPatrimonialResult(response?.dto);
     };
 
-
-
-
-
-
     React.useEffect(()=>{
         retrieveEconomicResult();
         retrievePatrimonialResult();
@@ -144,7 +139,7 @@ export default function Dashboard() {
 
 
     return (
-        <div className="space-y-8 w-full bg-background text-foreground">
+        <div className="space-y-8 w-full text-foreground">
             <div className="text-center">
                 <h1 className="text-4xl font-bold mb-2">Benvenuto in Personal Finance</h1>
                 <p className="text-muted-foreground">Gestisci le tue finanze con semplicità!</p>

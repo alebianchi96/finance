@@ -237,7 +237,7 @@ export default function PatrimonialFundManager() {
 
             {/* Dialog per la modifica e l'inserimento dei fondi */}
             <Dialog open={open} onOpenChange={setOpen}>
-                <DialogContent>
+                <DialogContent className=" bg-secondary">
                     <DialogHeader>
                         <DialogTitle>{currentFund?.id ? "Modifica" : "Nuovo"} Fondo Patrimoniale</DialogTitle>
                     </DialogHeader>
@@ -273,7 +273,7 @@ export default function PatrimonialFundManager() {
                 const [currentFundInitMovement, setCurrentFundInitMovement] = useState<MovementDto | null>(null);
             */}
             <Dialog open={openInitFundDialog} onOpenChange={setOpenInitFundDialog}>
-                <DialogContent>
+                <DialogContent className=" bg-secondary">
                     <DialogHeader>
                         <DialogTitle>{currentFundInitMovement?.id ? "Modifica" : "Nuova"} Inizializzazione Fondo Patrimoniale</DialogTitle>
                     </DialogHeader>

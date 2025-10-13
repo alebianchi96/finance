@@ -63,7 +63,7 @@ export default function MovementForm({ movement, onSave, onCancel, isOpen, setIs
 
     return (
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
-            <DialogContent className="sm:max-w-[500px]">
+            <DialogContent className="sm:max-w-[500px] bg-secondary">
                 <DialogHeader>
                     <DialogTitle className="flex justify-around">
                         <div className="flex ">
@@ -95,7 +95,10 @@ export default function MovementForm({ movement, onSave, onCancel, isOpen, setIs
                                 id="amount"
                                 type="number"
                                 step="0.01"
-                                value={ formData.amount >= 0 ? formData.amount : '' }
+                                value={
+                                    formData.amount >= 0 || formData.amount <= 0 ?
+                                        formData.amount : ''
+                                }
                                 onChange={(e) => handleChange('amount', parseFloat(e.target.value))}
                                 required
                             />

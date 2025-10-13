@@ -220,7 +220,7 @@ export default function EconomicAccountManager() {
             </Table>
 
             <Dialog open={open} onOpenChange={setOpen}>
-                <DialogContent>
+                <DialogContent className=" bg-secondary">
                     <DialogHeader>
                         <DialogTitle>{currentAccount?.id ? "Modifica" : "Nuovo"} Conto Economico</DialogTitle>
                     </DialogHeader>

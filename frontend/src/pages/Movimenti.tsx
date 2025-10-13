@@ -120,7 +120,7 @@ export default function Movimenti() {
     };
 
     return (
-        <div className="space-y-8 w-full bg-background text-foreground">
+        <div className="space-y-8 w-full text-foreground">
             <h1 className="text-3xl font-bold">Gestione Movimenti</h1>
 
             <PatrimonialFundSelector

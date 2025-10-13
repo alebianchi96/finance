@@ -59,7 +59,7 @@ export default function Trasferimenti() {
     }
 
     return (
-        <div className="space-y-8 w-full bg-background text-foreground">
+        <div className="space-y-8 w-full text-foreground">
             <div className="flex items-center justify-between">
                 <h1 className="text-3xl font-bold">Trasferimenti tra Fondi</h1>
                 <Button onClick={handleAddTransfer}>Nuovo Trasferimento</Button>

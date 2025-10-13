@@ -9,7 +9,7 @@ export default function Amministrazione() {
     const [activeTab, setActiveTab] = useState("categories");
 
     return (
-        <div className="space-y-8 w-full bg-background text-foreground">
+        <div className="space-y-8 w-full text-foreground">
             <h1 className="text-3xl font-bold mb-6">Amministrazione</h1>
 
             <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">

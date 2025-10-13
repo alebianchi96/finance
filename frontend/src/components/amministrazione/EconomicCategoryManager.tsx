@@ -174,7 +174,7 @@ export default function EconomicCategoryManager() {
             </Table>
 
             <Dialog open={open} onOpenChange={setOpen}>
-                <DialogContent>
+                <DialogContent  className=" bg-secondary">
                     <DialogHeader>
                         <DialogTitle>{currentCategory?.id ? "Modifica" : "Nuova"} Categoria Economica</DialogTitle>
                     </DialogHeader>

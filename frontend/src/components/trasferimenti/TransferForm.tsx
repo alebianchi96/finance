@@ -33,7 +33,7 @@ export default function TransferForm({ patrimonialFunds, transfer, onSave, onCan
 
     return (
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
-            <DialogContent className="sm:max-w-[500px]">
+            <DialogContent className="sm:max-w-[500px] bg-secondary">
                 <DialogHeader>
                     <DialogTitle>
                         {transfer.id ? "Modifica Trasferimento" : "Nuovo Trasferimento"}
