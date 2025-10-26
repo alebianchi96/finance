@@ -1,5 +1,5 @@
 // src/pages/Trasferimenti.tsx
-import {useEffect, useState} from "react";
+import React, {useEffect, useState} from "react";
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
 import {Button} from "@/components/ui/button";
 import TransferForm from "@/components/trasferimenti/TransferForm";
@@ -9,6 +9,8 @@ import TransferMovementDto from "@/dto/finance/TransferMovementDto.ts";
 import PatrimonialFundService from "@/service/PatrimonialFundService.ts";
 import MovementService from "@/service/MovementService.ts";
 import DateUtils from "@/lib/DateUtils.ts";
+import PfMenuIcon from "@/components/layout/PfMenuIcon.tsx";
+import {navItems} from "@/components/layout/NavBarItemList.tsx";
 
 export default function Trasferimenti() {
 
@@ -59,9 +61,12 @@ export default function Trasferimenti() {
     }
 
     return (
-        <div className="space-y-8 w-full text-foreground">
+        <div className="space-y-4 w-full text-foreground">
             <div className="flex items-center justify-between">
-                <h1 className="text-3xl font-bold">Trasferimenti tra Fondi</h1>
+                <div className="text-xl font-bold flex items-center gap-2 text-primary">
+                    <PfMenuIcon item={navItems.filter(item=>item.label.toLowerCase()==='trasferimenti')[0]} />
+                    <div>Trasferimenti tra fondi</div>
+                </div>
                 <Button onClick={handleAddTransfer}>Nuovo Trasferimento</Button>
             </div>
 

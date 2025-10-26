@@ -29,7 +29,7 @@ export default function Layout() {
 
             <PfNavBar theme={theme} changeTheme={changeTheme} />
 
-            <main className="flex-1 container mx-auto mt-15 px-4 py-8">
+            <main className="flex-1 container mx-auto mt-2 px-4 py-4">
                 <Outlet />
             </main>
 

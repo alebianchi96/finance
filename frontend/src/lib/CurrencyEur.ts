@@ -1,19 +1,19 @@
 export default class CurrencyEur {
 
-    static instance: CurrencyEur | null = null;
+    private static readonly formatter = new Intl.NumberFormat('it-IT', {
+        style: 'currency',
+        currency: 'EUR'
+    });
 
-    static getInstance(): CurrencyEur {
-        if (!this.instance) {
-            this.instance = new Intl.NumberFormat('it-IT', {
-                style: 'currency',
-                currency: 'EUR'
-            });
-        }
-        return this.instance;
+    static format(amount: number): string {
+        return CurrencyEur.formatter.format(amount);
     }
 
-    format(amount: number): string {
-        return CurrencyEur.getInstance().format(amount);
+    static formatOrNull(amount: number | undefined): string {
+        if( !amount ) {
+            return "-,-- €";
+        }
+        return CurrencyEur.formatter.format(amount);
     }
 
 }

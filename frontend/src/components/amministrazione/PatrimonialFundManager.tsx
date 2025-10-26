@@ -190,7 +190,7 @@ export default function PatrimonialFundManager() {
                                         (
                                             <>
                                             <span className={'flex items-center gap-2'}>
-                                                {CurrencyEur.getInstance().format(fund.initialMovement?.amount ?? 0)}
+                                                {CurrencyEur.format(fund.initialMovement?.amount ?? 0)}
                                             </span>
                                             <Button variant="secondary" size="sm" onClick={() => {
                                                 setCurrentFundInitMovement(fund.initialMovement);

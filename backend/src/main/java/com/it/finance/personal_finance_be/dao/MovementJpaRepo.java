@@ -56,4 +56,8 @@ public interface MovementJpaRepo extends PfRepository<MovementEntity> {
             " WHERE m.patrimonialFund.id = :idPatrimonialFund " +
             " AND m.note = :initNote")
     MovementEntity findSaldoInizialeByPatrimonialFundId(Long idPatrimonialFund, String initNote);
+
+    @Query("SELECT DISTINCT YEAR(m.dt) FROM MovementEntity m ")
+    List<Integer> listYearsWithTransactions();
+
 }

@@ -21,7 +21,7 @@ export default function MovementsTable({ movements, onEdit, onDelete }: Movement
                     <TableRow>
                         <TableHead>Data</TableHead>
                         <TableHead>Account Economico</TableHead>
-                        <TableHead className="hidden sm:table-cell">Note</TableHead>
+                        <TableHead className="hidden lg:table-cell">Note</TableHead>
                         <TableHead className="text-right">Importo</TableHead>
                         <TableHead className="text-center">Azioni</TableHead>
                     </TableRow>
@@ -43,9 +43,9 @@ export default function MovementsTable({ movements, onEdit, onDelete }: Movement
                                 <TableCell>
                                     {movement.economicAccount?.economicCategory?.label + " - " + movement.economicAccount?.label}
                                 </TableCell>
-                                <TableCell className="hidden sm:table-cell">{movement.note}</TableCell>
-                                <TableCell className={`text-right ${movement.amount >= 0 ? 'text-green-500' : 'text-red-500'}`}>
-                                    {CurrencyEur.getInstance().format(movement.amount)}
+                                <TableCell className="hidden lg:table-cell">{movement.note}</TableCell>
+                                <TableCell className={`hover:font-bold tracking-wider text-right ${movement.amount >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+                                    {CurrencyEur.format(movement.amount)}
                                 </TableCell>
                                 <TableCell>
                                     <div className="flex justify-center space-x-2">

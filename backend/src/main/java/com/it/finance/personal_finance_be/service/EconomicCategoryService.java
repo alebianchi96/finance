@@ -44,7 +44,8 @@ public class EconomicCategoryService extends PfService<EconomicCategoryEntity, E
     public boolean checkInsertFields(EconomicCategoryEntity entity) {
         if( !StringUtils.hasText(entity.getCode())
                 || !StringUtils.hasText(entity.getLabel())
-                || !StringUtils.hasText(entity.getNature()) )
+                || !StringUtils.hasText(entity.getNature())
+                || entity.getOrdering() == null)
         {
             return false;
         }
@@ -55,7 +56,8 @@ public class EconomicCategoryService extends PfService<EconomicCategoryEntity, E
     public boolean checkEditFields(EconomicCategoryEntity entity) {
         if( !StringUtils.hasText(entity.getCode())
                 || !StringUtils.hasText(entity.getLabel())
-                || !StringUtils.hasText(entity.getNature()) )
+                || !StringUtils.hasText(entity.getNature())
+                || entity.getOrdering() == null)
         {
             return false;
         }

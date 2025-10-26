@@ -21,22 +21,33 @@ export default class DateUtils {
         return DateUtils.formatDateByTemplate(d, "YYYY-MM-DD");
     }
 
-    static getMonthName(d:Date): string {
+    static getMonthIndex(d:Date): number {
         if(!d) { return ""; }
-
         const currentMonthAsString = moment( d )
             .tz(DateUtils.getLocaleTz())
             .format("MM");
+        return Number.parseInt(currentMonthAsString)-1;
+    }
 
-        const currentMonthIndex = Number.parseInt(currentMonthAsString) - 1;
+    static getMonthName(d:Date): string {
+        if(!d) { return ""; }
+        const currentMonthAsString = moment( d )
+            .tz(DateUtils.getLocaleTz())
+            .format("MM");
+        return DateUtils.getMonthNameByIndex112( currentMonthAsString );
+    }
 
+
+    static getMonthNameByIndex112( index112:string ) : string {
+        if(!index112) { return ""; }
+        const monthIndex = Number.parseInt( index112 ) - 1;
         const monthNames = [
             "Gennaio", "Febbraio", "Marzo", "Aprile", "Maggio", "Giugno",
             "Luglio", "Agosto", "Settembre", "Ottobre", "Novembre", "Dicembre"
         ];
-
-        return monthNames[currentMonthIndex];
+        return monthNames[monthIndex];
     }
+
 
     static parse(yyyyMMdd: string|undefined): Date|undefined {
 
@@ -46,7 +57,7 @@ export default class DateUtils {
             return undefined;
         }
 
-        return moment(yyyyMMdd, "YYYY-MM-DD").toDate()
+        return moment(yyyyMMdd, "YYYY-MM-DD").tz(DateUtils.getLocaleTz()).toDate()
     }
 
     /* Date ranges */
@@ -65,7 +76,7 @@ export default class DateUtils {
     }
 
     static currentDate() : Date {
-        return new Date();
+        return moment().tz(DateUtils.getLocaleTz()).toDate();
     }
 
     static startOfMonthDate() : Date {
@@ -74,9 +85,13 @@ export default class DateUtils {
         return startMonth;
     }
 
-    static startOfYearDate() : Date {
-        return new Date(DateUtils.currentDate().getFullYear(), 0, 0)
+    static startOfYearDate(year:number | undefined) : Date {
+        year = year ?? DateUtils.currentDate().getFullYear();
+        return moment(new Date(year, 0, 0))
+            .tz(DateUtils.getLocaleTz())
+            .toDate();
     }
+
 
     static currentYearAsString() : string {
         return DateUtils.getUnitAsStringFromCurrentDate( "YYYY" );

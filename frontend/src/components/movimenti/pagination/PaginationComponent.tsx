@@ -20,7 +20,7 @@ export default function PaginationComponent({
         <>
         { movements?.length > 0 ?
             (
-                <div className=" h-2 w-full flex items-center justify-center rounded">
+                <div className="py-4 h-2 w-full flex items-center justify-center rounded">
                     <div className="w-1/3 ">
                         <Button
                             className={ isActivePrevButton(paginationData) ? DISABLED_BTN_CLASS:"" }

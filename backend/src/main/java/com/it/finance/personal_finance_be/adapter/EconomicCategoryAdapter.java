@@ -19,6 +19,7 @@ public class EconomicCategoryAdapter extends PfTypoAdapter<EconomicCategoryEntit
             return null; // Handle null Entity case
         }
         entity.setNature(dto.getNature());
+        entity.setOrdering(dto.getOrdering());
         return entity;
 
     }
@@ -30,6 +31,7 @@ public class EconomicCategoryAdapter extends PfTypoAdapter<EconomicCategoryEntit
             return null; // Handle null DTO case
         }
         dto.setNature(entity.getNature());
+        dto.setOrdering(entity.getOrdering());
         return dto;
     }
 
@@ -39,6 +41,7 @@ public class EconomicCategoryAdapter extends PfTypoAdapter<EconomicCategoryEntit
         entity.setNature( dto.getNature() );
         entity.setLabel( dto.getLabel() );
         entity.setCode( dto.getCode() );
+        entity.setOrdering( dto.getOrdering() );
     }
 
 }

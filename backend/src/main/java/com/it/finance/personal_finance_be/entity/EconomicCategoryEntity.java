@@ -3,16 +3,22 @@ package com.it.finance.personal_finance_be.entity;
 import com.it.finance.personal_finance_be.framework.PfTypoEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import org.springframework.data.domain.ExampleMatcher;
 
+@EqualsAndHashCode(callSuper = true)
 @Entity
 @Table(name = "economic_categories")
+@Data
 public class EconomicCategoryEntity extends PfTypoEntity {
 
     @Column
     private String nature;
+
+    @Column
+    private Integer ordering;
 
     @Override
     public ExampleMatcher generateExample() {
@@ -23,11 +29,4 @@ public class EconomicCategoryEntity extends PfTypoEntity {
                 .withMatcher("nature", ExampleMatcher.GenericPropertyMatchers.exact());
     }
 
-    public String getNature() {
-        return nature;
-    }
-
-    public void setNature(String nature) {
-        this.nature = nature;
-    }
 }

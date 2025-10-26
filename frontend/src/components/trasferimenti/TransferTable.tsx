@@ -42,7 +42,7 @@ export default function TransferTable({ transfers, onEdit, onDelete }: TransferT
                             <TableCell>{transfer.patrimonialFundFrom?.label}</TableCell>
                             <TableCell>{transfer.patrimonialFundTo?.label}</TableCell>
                             <TableCell className="text-right">{
-                                CurrencyEur.getInstance().format(Math.abs(transfer.amount))
+                                CurrencyEur.format(Math.abs(transfer.amount))
                             }</TableCell>
                             <TableCell>{transfer.note}</TableCell>
                             <TableCell>

@@ -17,7 +17,7 @@ public class Main {
                 .atZone(ZoneId.systemDefault())
                 .toLocalDateTime();
 
-        System.out.println(ldt); // true if amount is greater than zero
+        System.out.println(ldt.getYear()); // true if amount is greater than zero
 
 
     }

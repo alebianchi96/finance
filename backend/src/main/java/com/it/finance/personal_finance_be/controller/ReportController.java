@@ -4,6 +4,8 @@ import com.it.finance.personal_finance_be.dto.EconomicResultDto;
 import com.it.finance.personal_finance_be.dto.MovementDto;
 import com.it.finance.personal_finance_be.dto.PatrimonialResultDto;
 import com.it.finance.personal_finance_be.dto.TransferMovementDto;
+import com.it.finance.personal_finance_be.dto.view.VEconomicResultDetailDto;
+import com.it.finance.personal_finance_be.dto.view.VEconomicResultDto;
 import com.it.finance.personal_finance_be.entity.MovementEntity;
 import com.it.finance.personal_finance_be.framework.*;
 import com.it.finance.personal_finance_be.framework.utilities.DateUtils;
@@ -16,6 +18,8 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
+import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/report")
@@ -24,6 +28,16 @@ public class ReportController {
 
     @Autowired
     private ReportService service;
+
+
+    @GetMapping("/years")
+    public List<Integer> listYearsWithTransactions() {
+        Set<Integer> hsYearsWithTransactions = service.listYearsWithTransactions();
+        return hsYearsWithTransactions.stream()
+                .sorted(java.util.Comparator.reverseOrder())
+                .toList();
+    }
+
 
     // risultato economico nel periodo indicato
     // totale entrate
@@ -70,5 +84,25 @@ public class ReportController {
             ));
         }
     }
+
+
+    @GetMapping("/economic/result/year/{year}")
+    public ResponseEntity<List<VEconomicResultDto>> findEconomicResultByYear(
+            @PathVariable Integer year) {
+        return ResponseEntity.ok( service.findEconomicResultByYear(year, null) );
+    }
+
+    @GetMapping("/economic/result/year/{year}/month/{month}")
+    public ResponseEntity<List<VEconomicResultDto>> findEconomicResultByYearMonth(
+            @PathVariable Integer year, @PathVariable Integer month) {
+        return ResponseEntity.ok( service.findEconomicResultByYear(year, month) );
+    }
+
+    @GetMapping("/economic/result/detail/year/{year}")
+    public ResponseEntity<List<VEconomicResultDetailDto>> findEconomicResultDetail(
+            @PathVariable Integer year) {
+        return ResponseEntity.ok( service.findEconomicResultDetail(year) );
+    }
+
 
 }

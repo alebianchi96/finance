@@ -65,9 +65,9 @@ export default function MovementForm({ movement, onSave, onCancel, isOpen, setIs
         <Dialog open={isOpen} onOpenChange={setIsOpen}>
             <DialogContent className="sm:max-w-[500px] bg-secondary">
                 <DialogHeader>
-                    <DialogTitle className="flex justify-around">
-                        <div className="flex ">
-                           <span>{movement.id ? "Modifica Movimento" : "Nuovo Movimento"}</span>
+                    <DialogTitle className="flex justify-start">
+                        <div className="flex mr-4">
+                           <span>{movement.id ? "💲 Modifica Movimento" : "💲 Nuovo Movimento"}</span>
                         </div>
                         <BulletAndLabelNature nature={CategoryNature.get(nature)} />
                     </DialogTitle>

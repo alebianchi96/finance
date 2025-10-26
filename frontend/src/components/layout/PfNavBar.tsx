@@ -3,6 +3,8 @@ import {cn} from "@/lib/utils.ts";
 import {ArrowDownUp, LayoutDashboard, Moon, Repeat, Settings, Sun} from "lucide-react";
 import React from "react";
 import Logo from "@/svg/Logo.tsx";
+import {navItems} from "@/components/layout/NavBarItemList.tsx";
+import PfMenuIcon from "@/components/layout/PfMenuIcon.tsx";
 
 export default function PfNavBar (
     {
@@ -15,7 +17,7 @@ export default function PfNavBar (
 
     const [ menuOpened, setMenuOpened ] = React.useState(true);
 
-    const [position, setPosition] = React.useState({ x: window.innerWidth/2, y: 10});
+    const [position, setPosition] = React.useState({ x: window.innerWidth/2, y: 20});
     const [isDragging, setIsDragging] = React.useState(false);
     const [dragStart, setDragStart] = React.useState({ x: 0, y: 0 });
 
@@ -64,6 +66,17 @@ export default function PfNavBar (
     };
 
     React.useEffect(() => {
+        const updateCenter = () => {
+            setPosition(prev => ({ ...prev, x: window.innerWidth / 2 }));
+        };
+
+        // centra subito e poi ad ogni ridimensionamento
+        updateCenter();
+        window.addEventListener('resize', updateCenter);
+        return () => window.removeEventListener('resize', updateCenter);
+    }, []);
+
+    React.useEffect(() => {
         if (isDragging) {
             window.addEventListener('mousemove', handleMouseMove);
             window.addEventListener('mouseup', handleMouseUp);
@@ -78,40 +91,19 @@ export default function PfNavBar (
         };
     }, [isDragging, dragStart]);
 
-    const navItems = [
-        { path: '/', label: 'Dashboard', icon: (classes: string) => { return (<LayoutDashboard className={classes} />) } },
-        { path: '/movimenti', label: 'Movimenti', icon: (classes: string) => { return (<ArrowDownUp className={classes} />) } },
-        { path: '/trasferimenti', label: 'Trasferimenti', icon: (classes: string) => { return (<Repeat className={classes} />) } },
-        { path: '/amministrazione', label: 'Amministrazione', icon: (classes: string) => { return (<Settings className={classes} />) } },
-    ];
-
-    const MenuIcon = ( {item}:{item:any} ) => {
-
-        let isSelected =  location.pathname === item.path;
-        let classesSelectedOrNotCss = isSelected ? " text-primary font-medium " : " "
-        let classesOnHover = " w-8 h-8 transition-colors hover:text-primary " +
-            // "hover:-translate-y-1 transition-all hover:pb-1" +
-            " hover:shadow-xs " +
-            "hover:border-solid hover:border-gray-400 " +
-            "rounded hover:border-bottom hover:border-b-2 ";
-
-        let allClasses = classesSelectedOrNotCss + classesOnHover;
-
-        return (
-            <>{ item.icon(allClasses) }</>
-        )
-    }
-
     const toggleMenu = () => {
         // Implement menu toggle logic if needed
 
-        setMenuOpened((ex)=>{console.log(ex); return !ex});
+        setMenuOpened((ex)=>{
+            // console.log(ex);
+            return !ex
+        });
     };
 
     return (
-        <div className={"px-4 py-2 cursor-move" +
-            " fixed z-[9999] w-fit " +
-            " rounded-lg bg-secondary shadow-lg  " +
+        <div className={"px-4 py-2 bg-card relative mb-2" +
+            //" fixed z-[9999] cursor-move  bg-secondary " +
+            " rounded-lg w-fit shadow-lg  " +
             " flex gap-4"}
              style={{
                  left: `${position.x}px`,
@@ -120,8 +112,9 @@ export default function PfNavBar (
              }}
         >
             <div className={"flex justify-between items-center"}
-                onMouseDown={handleMouseDown}
-                onTouchStart={handleTouchStart}>
+                // onMouseDown={handleMouseDown}
+                //onTouchStart={handleTouchStart}
+            >
                 <button
                     onClick={toggleMenu}
                     className="rounded-full cursor-pointer hover:bg-primary mr-2 p-2">
@@ -129,10 +122,10 @@ export default function PfNavBar (
                 </button>
                 <div>Personal Finance</div>
             </div>
-            <div className={"flex items-center gap-2 " + (menuOpened ? "block" : "hidden")}>
+            <div className={"flex items-center gap-2 transition-shadow " + (menuOpened ? "block" : "hidden")}>
                 {navItems.map(item => (
                     <Link title={item.label} key={item.path} to={item.path} className={"px-2"}>
-                        <MenuIcon item={item} />
+                        <PfMenuIcon item={item} />
                     </Link>
                 ))}
                 <button

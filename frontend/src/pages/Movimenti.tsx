@@ -1,25 +1,18 @@
 // src/pages/Movimenti.tsx
-import {useEffect, useState} from "react";
-import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
-import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
-import {Button} from "@/components/ui/button";
+import React, {useEffect, useState} from "react";
 import MovementsTable from "@/components/movimenti/MovementsTable.tsx";
 import MovementForm from "@/components/movimenti/MovementForm";
 import PatrimonialFundDto from "@/dto/finance/PatrimonialFundDto";
 import MovementDto from "@/dto/finance/MovementDto";
 import PatrimonialFundService from "@/service/PatrimonialFundService.ts";
 import MovementService from "@/service/MovementService.ts";
-import CurrencyEur from "@/lib/CurrencyEur.ts";
 import DateUtils from "@/lib/DateUtils.ts";
 import type PaginationData from "@/dto/finance/pagination/PaginationData.ts";
-import {
-    DEFAULT_PAGINATION_DATA,
-    DISABLED_BTN_CLASS,
-    isActivePrevButton,
-    isActiveSuccButton
-} from "@/dto/finance/pagination/PaginationUtils.ts";
+import {DEFAULT_PAGINATION_DATA} from "@/dto/finance/pagination/PaginationUtils.ts";
 import PaginationComponent from "@/components/movimenti/pagination/PaginationComponent.tsx";
 import PatrimonialFundSelector from "@/components/movimenti/PatrimonialFundSelector.tsx";
+import {navItems} from "@/components/layout/NavBarItemList.tsx";
+import PfMenuIcon from "@/components/layout/PfMenuIcon.tsx";
 
 
 export default function Movimenti() {
@@ -120,8 +113,11 @@ export default function Movimenti() {
     };
 
     return (
-        <div className="space-y-8 w-full text-foreground">
-            <h1 className="text-3xl font-bold">Gestione Movimenti</h1>
+        <div className="space-y-4 w-full text-foreground">
+            <div className="text-xl font-bold flex items-center gap-2 text-primary">
+                <PfMenuIcon item={navItems.filter(item=>item.label.toLowerCase()==='movimenti')[0]} />
+                <div>Gestione costi e ricavi</div>
+            </div>
 
             <PatrimonialFundSelector
                 patrimonialFunds={patrimonialFunds}

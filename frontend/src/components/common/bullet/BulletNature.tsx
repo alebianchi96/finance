@@ -13,6 +13,8 @@ export default function BulletNature(
         color = "bg-green-600";
     } else if ( nature?.toString()==="F" ) {
         color = "bg-blue-600"
+    } else if ( nature==null ) {
+        color = "transparent"
     }
 
     let blinkClass = blinking ? "blinking-dot" : "";

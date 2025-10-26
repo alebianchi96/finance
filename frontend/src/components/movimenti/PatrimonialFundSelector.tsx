@@ -41,35 +41,47 @@ export default function PatrimonialFundSelector (
         [selectedFundAmount]
     )
 
+
+    function FundButton({i}:{i:PatrimonialFundDto}) {
+
+        let isSelected = selectedFundId === i.id.toString();
+
+        return (
+            <Button
+                variant={isSelected ? "default" : "outline"}
+                key={i.id}
+                style={{ "minWidth":'200px', "cursor":'pointer' }}
+                className={"p-7 " + (isSelected ? ' bg-primary ' : ' bg-card')}
+                onClick={() => setSelectedFundId(i.id.toString())}
+            >
+                {
+                    isSelected && (selectedFundAmount || selectedFundAmount==0) ?
+                        (
+                            <div className="">
+                                <div>{i.label}</div>
+                                <div>{CurrencyEur.format(selectedFundAmount)}</div>
+                            </div>
+                        )
+                        : i.label
+                }
+            </Button>
+        );
+    }
+
+
     return (
+        <>
         <Card>
             <CardHeader>
                 <CardTitle>Seleziona Fondo Patrimoniale</CardTitle>
             </CardHeader>
             <CardContent>
                 { /* Lista dei fondi patrimoniali */ }
-                <div className="flex gap-4 flex-wrap w-full">
+                <div className="flex gap-4 w-full flex-wrap justify-center lg:justify-start">
                     {
                         patrimonialFunds?.length > 0 ? (
                             patrimonialFunds?.map(( i )=>(
-                                <Button
-                                    variant={selectedFundId === i.id.toString() ? "default" : "outline"}
-                                    key={i.id}
-                                    style={{ "minWidth":'50px', "cursor":'pointer' }}
-                                    className="p-7"
-                                    onClick={() => setSelectedFundId(i.id.toString())}
-                                >
-                                    {
-                                        selectedFundId === i.id.toString() && (selectedFundAmount || selectedFundAmount==0) ?
-                                            (
-                                                <div className="flex flex-col items-start">
-                                                    <div>{i.label}</div>
-                                                    <div>{CurrencyEur.getInstance().format(selectedFundAmount)}</div>
-                                                </div>
-                                            )
-                                            : i.label
-                                    }
-                                </Button>
+                                <FundButton i={i} key={i.id}/>
                             ))
                         )
                         :NO_FUND_FOUND
@@ -102,8 +114,8 @@ export default function PatrimonialFundSelector (
                 { /* Importi calcoli */ }
                 { selectedFundId ? (
                     <>
-                        <div className="mt-4 flex flex-wrap gap-4">
-                            <div className="w-1/2">
+                        <div className="mt-4 md:flex gap-4">
+                            <div className="lg:w-1/3">
                                 <LabelCalculatedAmount
                                     type={TypeCalculatedAmount.REC}
                                     realFundAmount={realFundAmount}
@@ -114,11 +126,11 @@ export default function PatrimonialFundSelector (
                                         type="text"
                                         className="text-right bg-muted"
                                         readOnly
-                                        value={ CurrencyEur.getInstance().format( selectedFundAmount ) }
+                                        value={ CurrencyEur.format( selectedFundAmount ) }
                                     />
                                 </div>
                             </div>
-                            <div className="w-1/2">
+                            <div className="lg:w-1/3">
                                 <LabelCalculatedAmount
                                     type={TypeCalculatedAmount.REAL}
                                     realFundAmount={realFundAmount}
@@ -135,7 +147,7 @@ export default function PatrimonialFundSelector (
                                 </div>
                             </div>
 
-                            <div className="w-1/2">
+                            <div className="lg:w-1/3">
                                 <LabelCalculatedAmount
                                     type={TypeCalculatedAmount.CALC}
                                     realFundAmount={realFundAmount}
@@ -146,7 +158,7 @@ export default function PatrimonialFundSelector (
                                         type="text"
                                         className="text-right bg-muted"
                                         readOnly
-                                        value={ CurrencyEur.getInstance().format( realFundAmount-selectedFundAmount ) }
+                                        value={ CurrencyEur.format( realFundAmount-selectedFundAmount ) }
                                     />
                                 </div>
                             </div>
@@ -154,21 +166,22 @@ export default function PatrimonialFundSelector (
                     </>
                 ) : (<></>)}
 
-                { /* Bottoni per aggiungi */ }
-                <div className="flex flex-wrap justify-end gap-4 py-4 mt-4">
-                    <AddCostOrRevenueButton
-                        handleAddMovement={handleAddMovement}
-                        selectedFundId={selectedFundId}
-                        categoryNature={CategoryNature.C}
-                    />
-                    <AddCostOrRevenueButton
-                        handleAddMovement={handleAddMovement}
-                        selectedFundId={selectedFundId}
-                        categoryNature={CategoryNature.R}
-                    />
-                </div>
             </CardContent>
         </Card>
+        { /* Bottoni per aggiungi */ }
+        <div className="flex flex-wrap justify-center gap-4 py-4">
+            <AddCostOrRevenueButton
+                handleAddMovement={handleAddMovement}
+                selectedFundId={selectedFundId}
+                categoryNature={CategoryNature.C}
+            />
+            <AddCostOrRevenueButton
+                handleAddMovement={handleAddMovement}
+                selectedFundId={selectedFundId}
+                categoryNature={CategoryNature.R}
+            />
+        </div>
+        </>
     )
 }
 
