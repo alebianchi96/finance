@@ -1,0 +1,65 @@
+
+	1)	lista anni con con movimenti per combobox
+	
+	2)	primo div
+		---------
+			- lista valori patrimoniali correnti
+			- totale lista valori patrimoniali correnti
+			- valore patrimonio inizio anno
+			
+	3)	secondo div
+		-----------
+			-	saldo per ogni mese dell'anno
+			-	{
+					se saldo positivo => pallino verde
+					se saldo negativo => pallino rosso
+					altrimenti 			 -
+				}
+			-	media dei saldi != 0 nell'anno selezionato
+			
+	4)	situazione economica annuale e per ogni mese
+					totale	gen	feb	mar	apr	mag	giu	lug	ago	set	ott	nov	dic
+		category  |
+		economic  |
+		totale	  |
+		
+		
+		
+	Viste
+	
+		V_ECONOMIC_RESULTS [risultati economici totali per ogni mese]
+			|	ys		|	mm	|	totale_ricavi	|	totale_costi	|	totale	|
+			
+		V_ECONOMIC_RESULTS_DETAIL
+			|	ys		|	categoria	|	conto	|	gen	|	feb	|	...	| total_for_year
+			
+
+		+
+
+		select ec.label as category, '' as conto
+		from economic_categories ec 
+		join (
+			 select ys from (
+				select distinct EXTRACT(YEAR FROM m0.dt)::int as ys
+				from movements m0
+				where m0.fk_economic_account is not null
+			) y0
+		 ) years on 1=1
+		
+		+
+
+		select ec.label as category, ea.label as conto
+		from economic_accounts ea 
+			join economic_categories ec on ec.id = ea.fk_economic_category 
+			join (
+				 select ys from (
+					select distinct EXTRACT(YEAR FROM m0.dt)::int as ys
+					from movements m0
+					where m0.fk_economic_account is not null
+				) y0
+			 ) years on 1=1
+			 
+			 
+	
+>	togliere la crud delle categorie dalla grafica
+>	mostrare tutte le categorie nella pagina dei conti economici
